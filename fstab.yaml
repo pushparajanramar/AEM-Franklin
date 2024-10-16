@@ -1,1 +1,4 @@
-mountpoints: https://sharepoint.capgemini.com/Sites/helix/Shared%20Documents/aem-edge-sample
+mountpoints:
+  /: https://jnj.sharepoint.com/teams/iMKIT-External-AdobeEdgePOC/Shared%20Documents/eds
+  #/: https://adobeenterprisesupportaem.sharepoint.com/sites/hlx-test-project/Shared%20Documents/website
+  #/: https://adobeenterprisesupportaem.sharepoint.com/sites/hlx-test-project/mysubsite/Shared%20Documents/website
