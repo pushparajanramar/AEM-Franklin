@@ -90,7 +90,7 @@ function decorateLinks(main) {
       }
 
       // Check if <a> contains #bookmark in href and has no existing id
-      if (href.includes('#bookmark') && !link.hasAttribute('id')) {
+      if ( !link.hasAttribute('id')) {
         // Generate a unique id
         linkCounter++;
         const uniqueId = `link-${linkCounter}`;
