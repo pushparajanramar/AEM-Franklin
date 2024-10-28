@@ -76,8 +76,8 @@ function decorateLinks(main) {
       return url.pathname + url.search + url.hash;
   }
 
-  // Counter to generate unique ids for each internal reverse link
-  let linkCounter = 0;
+  // Counter to generate unique ids specifically for <sup> links
+  let supLinkCounter = 0;
 
   // Loop through each anchor element
   links.forEach((link) => {
@@ -93,24 +93,26 @@ function decorateLinks(main) {
           link.setAttribute('href', relativeHref);
       }
 
-      // Generate a unique id for each internal link if it doesn't already have one
-      linkCounter++;
-      const uniqueId = id || `link-${linkCounter}`;
-      if (!link.id) {
-          link.setAttribute('id', uniqueId);
-      }
+      // Increment counter and create a unique id for each link within <sup> tags
+      supLinkCounter++;
+      const uniqueSupId = `sup-link-${supLinkCounter}`;
 
       // Check if there's already an anchor inside <sup>
       if (!supTag.querySelector('a')) {
           // Create a new <a> tag around the content of <sup>
           const newLink = document.createElement('a');
-          newLink.href = `#${uniqueId}`;
+          newLink.href = `#${uniqueSupId}`;
           newLink.textContent = supTag.textContent.trim();
           newLink.style.color = '#007bff'; // Optional styling for visibility
 
           // Clear the original <sup> content and append the new <a> tag
           supTag.innerHTML = '';
           supTag.appendChild(newLink);
+      }
+
+      // Set a unique ID for the original link if it doesn't have one
+      if (!link.id) {
+          link.setAttribute('id', uniqueSupId);
       }
 
       // Additional functionality: Get the parent <p> tag of the current link
@@ -125,12 +127,12 @@ function decorateLinks(main) {
               const referenceNumber = firstSentenceMatch[0].trim();
 
               // Check if there's already an <a> tag with this reference number
-              const existingReferenceLink = parentParagraph.querySelector(`a[href="#${uniqueId}"]`);
+              const existingReferenceLink = parentParagraph.querySelector(`a[href="#${uniqueSupId}"]`);
 
               if (!existingReferenceLink) {
                   // Create a new <a> tag to wrap the reference number
                   const referenceLink = document.createElement('a');
-                  referenceLink.href = `#${uniqueId}`;
+                  referenceLink.href = `#${uniqueSupId}`;
                   referenceLink.textContent = referenceNumber;
                   referenceLink.style.color = '#007bff';
 
@@ -147,7 +149,7 @@ function decorateLinks(main) {
 
           if (!existingLink && firstSentence) {
               const reverseRef = document.createElement('a');
-              reverseRef.href = `#${uniqueId}`;
+              reverseRef.href = `#${uniqueSupId}`;
               reverseRef.textContent = firstSentence;
               reverseRef.style.display = 'block';
               reverseRef.style.fontSize = '0.9em';
