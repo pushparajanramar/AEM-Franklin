@@ -113,7 +113,7 @@ function decorateLinks(main) {
               if (!existingReferenceLink) {
                   // Create a backlink reference at the beginning of the paragraph
                   const backlink = document.createElement('a');
-                  backlink.href = `#${uniqueId}`;
+                  backlink.href = `#${'+uniqueId+'}`;
                   backlink.textContent = referenceNumber;
                   backlink.style.color = '#007bff';
 
