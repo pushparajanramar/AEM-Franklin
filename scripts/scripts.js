@@ -62,7 +62,7 @@ function convertToRelative(href) {
 
 // Helper function to generate a valid id from the relative URL
 function generateId(href) {
-  const url = new URL(href, window.location.origin);
+  const url = convertToRelative(href);
   return url.pathname.replace(/[^\w-]+/g, '_') + url.search.replace(/[^\w-]+/g, '_') + url.hash.replace(/[^\w-]+/g, '_');
 }
 
@@ -71,15 +71,16 @@ function decorateLinks(main) {
     const links = main.querySelectorAll('a');
     // Loop through each anchor element and add a target based on the business condition
     links.forEach((link) => {
-        const { href } = link;
-        const { id } = generateId(href);
+        const { href, title } = link;
+
         // Convert to relative URL if the link is within the same domain
         if (href.startsWith(window.location.origin)) {
             link.setAttribute('href', convertToRelative(href));
         }
       
-        if (id) {
-          link.setAttribute('id', id);
+        // Set the id attribute using the existing title attribute
+        if (title) {
+          link.setAttribute('id', link.title);
         }
 
     });
