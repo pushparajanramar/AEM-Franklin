@@ -54,6 +54,26 @@ function buildAutoBlocks(main) {
   }
 }
 
+// Helper function to convert absolute URLs to relative
+function convertToRelative(href) {
+    const url = new URL(href, window.location.origin);
+    return url.pathname + url.search + url.hash;
+}
+
+function decorateLinks(main) {
+    // Get all anchor elements within the main container
+    const links = main.querySelectorAll('a');
+    // Loop through each anchor element and add a target based on the business condition
+    links.forEach((link) => {
+        const { href } = link;
+        // Convert to relative URL if the link is within the same domain
+        if (href.startsWith(window.location.origin)) {
+            link.setAttribute('href', convertToRelative(href));
+        }
+
+    });
+}
+
 /**
  * Decorates the main element.
  * @param {Element} main The main element
@@ -66,6 +86,7 @@ export function decorateMain(main) {
   buildAutoBlocks(main);
   decorateSections(main);
   decorateBlocks(main);
+  decorateLinks(main);
 }
 
 /**
