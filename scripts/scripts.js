@@ -67,7 +67,6 @@ function generateId(href) {
 }
 
 
-
 function decorateLinks(main) {
   // Get all anchor elements within the main container
   const links = main.querySelectorAll('a');
@@ -105,23 +104,28 @@ function decorateLinks(main) {
 
           // Only proceed if a target element exists
           if (targetElement) {
-              // Check if any reverse links with href starting with "#link" already exist in the target element
-              const reverseLinkExists = Array.from(targetElement.querySelectorAll('a.reverse-link')).some(
-                  (existingLink) => existingLink.getAttribute('href').startsWith('#link')
-              );
+              // Find the parent paragraph of the target element
+              const targetParentParagraph = targetElement.closest('p');
 
-              if (!reverseLinkExists) {
-                  // Create a reverse reference link only if it doesn't exist
-                  const reverseRef = document.createElement('a');
-                  reverseRef.href = `#${link.id}`; // Use the existing or newly set id as the reverse reference
-                  reverseRef.textContent = '↩ Back to reference';
-                  reverseRef.classList.add('reverse-link'); // Add a specific class for easy identification
-                  reverseRef.style.display = 'block';
-                  reverseRef.style.fontSize = '0.9em';
-                  reverseRef.style.color = '#007bff';
+              if (targetParentParagraph) {
+                  // Check if any reverse links with href starting with "#link" already exist in the target paragraph
+                  const reverseLinkExists = Array.from(targetParentParagraph.querySelectorAll('a.reverse-link')).some(
+                      (existingLink) => existingLink.getAttribute('href').startsWith('#link')
+                  );
 
-                  // Append the reverse reference to the target element
-                  targetElement.appendChild(reverseRef);
+                  if (!reverseLinkExists) {
+                      // Create a reverse reference link only if it doesn't exist
+                      const reverseRef = document.createElement('a');
+                      reverseRef.href = `#${link.id}`; // Use the existing or newly set id as the reverse reference
+                      reverseRef.textContent = '↩ Back to reference';
+                      reverseRef.classList.add('reverse-link'); // Add a specific class for easy identification
+                      reverseRef.style.display = 'block';
+                      reverseRef.style.fontSize = '0.9em';
+                      reverseRef.style.color = '#007bff';
+
+                      // Append the reverse reference to the parent paragraph of the target element
+                      targetParentParagraph.appendChild(reverseRef);
+                  }
               }
           }
       }
@@ -151,15 +155,6 @@ function decorateLinks(main) {
       }
   });
 }
-
-
-
-
-
-
-
-
-
 
 
 
