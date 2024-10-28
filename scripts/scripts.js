@@ -66,7 +66,6 @@ function generateId(href) {
   return url.pathname.replace(/[^\w-]+/g, '_') + url.search.replace(/[^\w-]+/g, '_') + url.hash.replace(/[^\w-]+/g, '_');
 }
 
-
 function decorateLinks(main) {
   // Get all anchor elements within the main container
   const links = main.querySelectorAll('a');
@@ -82,7 +81,7 @@ function decorateLinks(main) {
   
   // Loop through each anchor element
   links.forEach((link) => {
-      const { href, title } = link;
+      const { href } = link;
 
       // Convert to relative URL if the link is within the same domain
       if (href.startsWith(window.location.origin)) {
@@ -126,6 +125,8 @@ function decorateLinks(main) {
       const parentParagraph = link.closest('p');
       if (parentParagraph) {
           const paragraphText = parentParagraph.textContent;
+
+          // Regular expression to match the first numeric prefix followed by a period, e.g., "1."
           const firstSentenceMatch = paragraphText.match(/^(\d+\.)/);
 
           if (firstSentenceMatch) {
@@ -138,8 +139,8 @@ function decorateLinks(main) {
                   referenceLink.textContent = referenceNumber;
                   referenceLink.style.color = '#007bff';
 
-                  // Insert the reference link at the start of the paragraph
-                  parentParagraph.innerHTML = referenceLink.outerHTML + paragraphText.replace(referenceNumber, '');
+                  // Insert the reference link at the start of the paragraph content
+                  parentParagraph.innerHTML = `${referenceLink.outerHTML} ${paragraphText.replace(referenceNumber, '')}`;
               }
           }
       }
