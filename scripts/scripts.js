@@ -66,7 +66,6 @@ function generateId(href) {
   return url.pathname.replace(/[^\w-]+/g, '_') + url.search.replace(/[^\w-]+/g, '_') + url.hash.replace(/[^\w-]+/g, '_');
 }
 
-
 function decorateLinks(main) {
   // Get all anchor elements within the main container
   const links = main.querySelectorAll('a');
@@ -143,6 +142,7 @@ function decorateLinks(main) {
       }
   });
 }
+
 
 
 
