@@ -66,6 +66,7 @@ function generateId(href) {
   return url.pathname.replace(/[^\w-]+/g, '_') + url.search.replace(/[^\w-]+/g, '_') + url.hash.replace(/[^\w-]+/g, '_');
 }
 
+
 function decorateLinks(main) {
   // Get all <a> tags within the main container
   const links = main.querySelectorAll('a');
@@ -75,9 +76,6 @@ function decorateLinks(main) {
       const url = new URL(href, window.location.origin);
       return url.pathname + url.search + url.hash;
   }
-
-  // Counter to generate unique ids for each internal reverse link if needed
-  let linkCounter = 0;
 
   // Loop through each anchor element
   links.forEach((link) => {
@@ -89,17 +87,16 @@ function decorateLinks(main) {
           link.setAttribute('href', relativeHref);
       }
 
-      // Generate a unique ID for each link if it doesn't already have one
+      // Ensure the link has a unique ID; if not, generate one
       if (!link.id) {
-          linkCounter++;
-          link.setAttribute('id', `link-${linkCounter}`);
+          link.id = `bookmark-${Math.random().toString(36).substr(2, 9)}`;
       }
 
-      // Additional functionality: Get the parent <p> tag of the current link
+      // Get the closest paragraph and modify the first sentence reference if needed
       const parentParagraph = link.closest('p');
 
       if (parentParagraph) {
-          // Extract the reference number (e.g., "2.") from the beginning of the paragraph
+          // Extract the reference number (e.g., "5.") from the beginning of the paragraph
           const paragraphText = parentParagraph.textContent;
           const firstSentenceMatch = paragraphText.match(/^(\d+\.)/);
 
@@ -110,12 +107,9 @@ function decorateLinks(main) {
               const existingReferenceLink = parentParagraph.querySelector(`a[href="#${link.id}"]`);
 
               if (!existingReferenceLink) {
-                  // Use the existing ID of the link or the generated one
-                  const reverseLinkId = link.id;
-
-                  // Create a new <a> tag to wrap the reference number
+                  // Create a new <a> tag to wrap the reference number, pointing to the first <a> ID in the paragraph
                   const referenceLink = document.createElement('a');
-                  referenceLink.href = `#${reverseLinkId}`;
+                  referenceLink.href = `#${link.id}`;
                   referenceLink.textContent = referenceNumber;
                   referenceLink.style.color = '#007bff';
 
