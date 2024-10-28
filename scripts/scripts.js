@@ -111,16 +111,8 @@ function decorateLinks(main) {
 
         if (!reverseLinkExists) {
           // Create a reverse reference link only if it doesn't exist
-          //const reverseRef = document.createElement('a');
-          //reverseRef.href = `#${link.id}`; // Use the existing or newly set id as the reverse reference
-          //reverseRef.textContent = '↩ Back to reference';
-          //reverseRef.classList.add('reverse-link'); // Add a specific class for easy identification
-          //reverseRef.style.display = 'block';
-          //reverseRef.style.fontSize = '0.9em';
-          //reverseRef.style.color = '#007bff';
-
-          // Append the reverse reference to the target element
-          targetElement.appendChild(reverseRef);
+          const reverseRef = document.createElement('a');
+          reverseRef.href = `#${link.id}`; // Use the existing or newly set id as the reverse reference
 
           // Additional functionality for reverse linking in the enclosing paragraph
           const parentParagraph = link.closest('p');
@@ -132,27 +124,36 @@ function decorateLinks(main) {
 
             if (firstSentenceMatch) {
               const referenceNumber = firstSentenceMatch[0].trim();
-              const existingReferenceLink = parentParagraph.querySelector(`a[href="#${link.id}"]`);
 
-              if (!existingReferenceLink) {
-                const referenceLink = document.createElement('a');
-                referenceLink.href = `#${link.id}`;
-                referenceLink.textContent = referenceNumber;
-                referenceLink.style.color = '#007bff';
+              // Create the anchor link for the reference number
+              const referenceLink = document.createElement('a');
+              referenceLink.href = `#${link.id}`;
+              referenceLink.textContent = referenceNumber;
+              referenceLink.style.color = '#007bff';
 
-                // Replace only the reference number in the paragraph
-                const remainingText = paragraphText.replace(referenceNumber, '').trim();
-                parentParagraph.innerHTML = `${referenceLink.outerHTML} ${remainingText}`;
-              }
+              // Remaining text after the first period
+              const remainingText = paragraphText.replace(referenceNumber, '').trim();
+
+              // Update the paragraph content
+              parentParagraph.innerHTML = `${referenceLink.outerHTML} ${remainingText}`;
             }
           }
+
+          // Set the reverse link's text and styling
+          reverseRef.textContent = '↩ Back to reference';
+          reverseRef.classList.add('reverse-link'); // Add a specific class for easy identification
+          reverseRef.style.display = 'block';
+          reverseRef.style.fontSize = '0.9em';
+          reverseRef.style.color = '#007bff';
+
+          // Append the reverse reference to the target element
+          targetElement.appendChild(reverseRef);
         }
       }
     }
-
-
   });
 }
+
 
 
 
