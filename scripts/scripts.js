@@ -89,12 +89,13 @@ function decorateLinks(main) {
           link.setAttribute('href', relativeHref);
       }
 
-        // Generate a unique id
-        linkCounter++;
-        const uniqueId = `link-${linkCounter}`;
-        link.setAttribute('id', uniqueId);
+      // Only generate a unique id if the link does not already have one
+      if (!link.hasAttribute('id')) {
+          linkCounter++;
+          const uniqueId = `link-${linkCounter}`;
+          link.setAttribute('id', uniqueId);
+      }
       
-
       // If the link has a hash (indicating an internal reference), add a reverse link
       if (link.hash) {
           const targetId = link.hash.substring(1); // Get the target ID without the '#' character
@@ -102,13 +103,13 @@ function decorateLinks(main) {
 
           if (targetElement) {
               // Check if a reverse link with the specific href already exists in the target element
-              const reverseLinkSelector = `a[href="#${uniqueId}"]`;
+              const reverseLinkSelector = `a[href="#${link.id}"]`;
               const existingReverseLink = targetElement.querySelector(reverseLinkSelector);
               
               if (!existingReverseLink) {
                   // Create a reverse reference link only if it doesn't exist
                   const reverseRef = document.createElement('a');
-                  reverseRef.href = `#${uniqueId}`; // Use the unique id as the reverse reference
+                  reverseRef.href = `#${link.id}`; // Use the existing or newly set id as the reverse reference
                   reverseRef.textContent = '↩ Back to reference';
                   reverseRef.style.display = 'block';
                   reverseRef.style.fontSize = '0.9em';
@@ -143,6 +144,7 @@ function decorateLinks(main) {
       }
   });
 }
+
 
 
 
