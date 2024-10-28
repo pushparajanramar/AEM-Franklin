@@ -130,7 +130,7 @@ function decorateLinks(main) {
       if (parentParagraph) {
           const paragraphText = parentParagraph.textContent;
 
-          // Regular expression to match the first numeric prefix followed by a period, e.g., "1."
+          // Regular expression to match the first numeric prefix followed by a period, e.g., "3."
           const firstSentenceMatch = paragraphText.match(/^(\d+\.)/);
 
           if (firstSentenceMatch) {
@@ -143,8 +143,9 @@ function decorateLinks(main) {
                   referenceLink.textContent = referenceNumber;
                   referenceLink.style.color = '#007bff';
 
-                  // Insert the reference link at the start of the paragraph content
-                  parentParagraph.innerHTML = `${referenceLink.outerHTML} ${paragraphText.replace(referenceNumber, '')}`;
+                  // Replace only the reference number in the paragraph
+                  const remainingText = paragraphText.replace(referenceNumber, '').trim();
+                  parentParagraph.innerHTML = `${referenceLink.outerHTML} ${remainingText}`;
               }
           }
       }
