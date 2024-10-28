@@ -82,7 +82,8 @@ function decorateLinks(main) {
   // Loop through each anchor element
   links.forEach((link) => {
       const { href } = link;
-
+      const parentParagraph = link.closest('p');
+      
       // Convert to relative URL if the link is within the same domain
       if (href.startsWith(window.location.origin)) {
           const relativeHref = convertToRelative(href);
@@ -118,13 +119,16 @@ function decorateLinks(main) {
                   reverseRef.style.color = '#007bff';
 
                   // Append the reverse reference to the target element
-                  targetElement.appendChild(reverseRef);
+                  //targetElement.appendChild(reverseRef);
+                  parentParagraph.appendChild(reverseRef);
               }
           }
       }
 
       // Additional functionality for reverse linking in the enclosing paragraph
-      const parentParagraph = link.closest('p');
+      
+      
+
       if (parentParagraph) {
           const paragraphText = parentParagraph.textContent;
 
