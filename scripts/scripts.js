@@ -90,7 +90,7 @@ function decorateLinks(main) {
       }
 
         // Check if the <a> tag has child elements and no existing id
-        if (link.children.length > 0 && !link.hasAttribute('id')) {
+        if (!link.hasAttribute('id')) {
           // Generate a unique id for each internal link
           linkCounter++;
           const uniqueId = `link-${linkCounter}`;
