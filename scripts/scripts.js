@@ -68,18 +68,21 @@ function generateId(href) {
 
 
 function decorateLinks(main) {
-  // Get all <a> tags within the main container
+  // Get all anchor elements within the main container
   const links = main.querySelectorAll('a');
-
+  
   // Helper function to convert absolute URLs to relative
   function convertToRelative(href) {
       const url = new URL(href, window.location.origin);
       return url.pathname + url.search + url.hash;
   }
 
+  // Counter to generate unique ids for each internal link
+  let linkCounter = 0;
+  
   // Loop through each anchor element
   links.forEach((link) => {
-      const { href, id } = link;
+      const { href, title } = link;
 
       // Convert to relative URL if the link is within the same domain
       if (href.startsWith(window.location.origin)) {
@@ -87,18 +90,37 @@ function decorateLinks(main) {
           link.setAttribute('href', relativeHref);
       }
 
-      // Check if the <a> tag has a <sup> child and lacks an ID
-      const hasSupChild = link.querySelector('sup') !== null;
-      if (hasSupChild && !id) {
-          // Extract the portion after "#" in the href as the ID
-          const hashIndex = href.indexOf('#');
-          if (hashIndex !== -1) {
-              const extractedId = href.substring(hashIndex + 1);
-              link.id = 'link-'+ extractedId;  // Set the extracted part as the id
+      // Generate a unique id for each internal link
+      linkCounter++;
+      const uniqueId = `link-${linkCounter}`;
+      link.setAttribute('id', uniqueId);
+
+      // If the link has a hash (indicating an internal reference), add a reverse link
+      if (link.hash) {
+          const targetId = link.hash.substring(1); // Get the target ID without the '#' character
+          const targetElement = document.getElementById(targetId);
+
+          if (targetElement) {
+              // Check if a reverse link with the specific href already exists in the target element
+              const reverseLinkSelector = `a[href="#${uniqueId}"]`;
+              const existingReverseLink = targetElement.querySelector(reverseLinkSelector);
+              
+              if (!existingReverseLink) {
+                  // Create a reverse reference link only if it doesn't exist
+                  const reverseRef = document.createElement('a');
+                  reverseRef.href = `#${uniqueId}`; // Use the unique id as the reverse reference
+                  reverseRef.textContent = '↩ Back to reference';
+                  reverseRef.style.display = 'block';
+                  reverseRef.style.fontSize = '0.9em';
+                  reverseRef.style.color = '#007bff';
+
+                  // Append the reverse reference to the target element
+                  targetElement.appendChild(reverseRef);
+              }
           }
       }
 
-      // Additional functionality for reverse linking, as before
+      // Additional functionality for reverse linking in the enclosing paragraph
       const parentParagraph = link.closest('p');
       if (parentParagraph) {
           const paragraphText = parentParagraph.textContent;
@@ -114,12 +136,14 @@ function decorateLinks(main) {
                   referenceLink.textContent = referenceNumber;
                   referenceLink.style.color = '#007bff';
 
+                  // Insert the reference link at the start of the paragraph
                   parentParagraph.innerHTML = referenceLink.outerHTML + paragraphText.replace(referenceNumber, '');
               }
           }
       }
   });
 }
+
 
 
 
