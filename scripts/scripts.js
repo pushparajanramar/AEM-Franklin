@@ -96,24 +96,6 @@ function decorateLinks(main) {
           link.setAttribute('id', `link-${linkCounter}`);
       }
 
-      // Proceed only if the <a> tag has a <sup> child and does not already contain a link
-      const supTag = link.querySelector('sup');
-      if (supTag && !supTag.querySelector('a')) {
-          // Increment the counter to create a unique link ID for the <sup> reference
-          supLinkCounter++;
-          const supLinkId = `sup-link-${supLinkCounter}`;
-
-          // Create a new <a> tag around the content of <sup>
-          const newLink = document.createElement('a');
-          newLink.href = `#${supLinkId}`;
-          newLink.textContent = supTag.textContent.trim();
-          newLink.style.color = '#007bff'; // Optional styling for visibility
-
-          // Clear the original <sup> content and append the new <a> tag
-          supTag.innerHTML = '';
-          supTag.appendChild(newLink);
-      }
-
       // Additional functionality: Get the parent <p> tag of the current link
       const parentParagraph = link.closest('p');
 
@@ -131,7 +113,7 @@ function decorateLinks(main) {
               if (!existingReferenceLink) {
                   // Generate a new unique ID for the reverse reference
                   // supLinkCounter++;
-                  const reverseLinkId = `sup-link-${supLinkCounter}`;
+                  const reverseLinkId = `link-${linkCounter}`;
 
                   // Create a new <a> tag to wrap the reference number
                   const referenceLink = document.createElement('a');
