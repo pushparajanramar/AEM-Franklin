@@ -78,7 +78,7 @@ function decorateLinks(main) {
   }
 
   // Counter to generate unique ids for each internal link
-  let linkCounter = 0;
+  let linkCounter = -1;
   
   // Loop through each anchor element
   links.forEach((link) => {
