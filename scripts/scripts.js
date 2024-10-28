@@ -99,23 +99,21 @@ function decorateLinks(main) {
 
           if (targetElement) {
               // Match and wrap the citation number with a reverse link
-              const citationText = targetElement.textContent;
+              const citationText = targetElement.innerHTML;
               const firstSentenceMatch = citationText.match(/^(\d+\.)/);
 
               if (firstSentenceMatch) {
                   const referenceNumber = firstSentenceMatch[0].trim();
-                  const reverseLink = document.createElement('a');
-                  reverseLink.href = `#${link.id}`;
-                  reverseLink.textContent = referenceNumber;
-                  reverseLink.classList.add('reference-link'); // Add class for styling
 
-                  // Wrap the reference number in the target paragraph with reverse link
-                  targetElement.innerHTML = `${reverseLink.outerHTML} ${citationText.replace(referenceNumber, '')}`;
+                  // Replace the number with a back reference link around it
+                  const reverseLinkHTML = `<a href="#${link.id}" class="reference-link">${referenceNumber}</a>`;
+                  targetElement.innerHTML = citationText.replace(referenceNumber, reverseLinkHTML);
               }
           }
       }
   });
 }
+
 
 
 
