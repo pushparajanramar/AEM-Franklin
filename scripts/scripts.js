@@ -89,13 +89,11 @@ function decorateLinks(main) {
           link.setAttribute('href', relativeHref);
       }
 
-      // Check if <a> contains #bookmark in href and has no existing id
-      if ( !link.hasAttribute('id')) {
         // Generate a unique id
         linkCounter++;
         const uniqueId = `link-${linkCounter}`;
         link.setAttribute('id', uniqueId);
-      }
+      
 
       // If the link has a hash (indicating an internal reference), add a reverse link
       if (link.hash) {
