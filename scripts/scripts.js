@@ -69,22 +69,49 @@ function generateId(href) {
 function decorateLinks(main) {
     // Get all anchor elements within the main container
     const links = main.querySelectorAll('a');
-    // Loop through each anchor element and add a target based on the business condition
+    
+    // Helper function to convert absolute URLs to relative
+    function convertToRelative(href) {
+        const url = new URL(href, window.location.origin);
+        return url.pathname + url.search + url.hash;
+    }
+    
+    // Loop through each anchor element
     links.forEach((link) => {
         const { href, title } = link;
 
         // Convert to relative URL if the link is within the same domain
         if (href.startsWith(window.location.origin)) {
-            link.setAttribute('href', convertToRelative(href));
-        }
-      
-        // Set the id attribute using the existing title attribute
-        if (title) {
-          link.setAttribute('id', link.title);
+            const relativeHref = convertToRelative(href);
+            link.setAttribute('href', relativeHref);
         }
 
+        // Set the id attribute using the existing title attribute
+        if (title) {
+            link.setAttribute('id', title);
+        }
+
+        // If the link has a hash (indicating an internal reference), add a reverse link
+        if (link.hash) {
+            const targetId = link.hash.substring(1); // Get the target ID without the '#' character
+            const targetElement = document.getElementById(targetId);
+
+            if (targetElement) {
+                // Create a reverse reference link
+                const reverseRef = document.createElement('a');
+                reverseRef.href = `#${link.id || title}`; // Use the link's id as the reverse reference
+                reverseRef.textContent = '↩ Back to reference';
+                reverseRef.style.display = 'block';
+                reverseRef.style.fontSize = '0.9em';
+                reverseRef.style.color = '#007bff';
+
+                // Append the reverse reference to the target element
+                targetElement.appendChild(reverseRef);
+            }
+        }
     });
 }
+
 
 /**
  * Decorates the main element.
