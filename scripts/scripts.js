@@ -76,13 +76,12 @@ function decorateLinks(main) {
       return url.pathname + url.search + url.hash;
   }
 
-  // Counter to generate unique ids for each internal reverse link
+  // Counter to generate unique ids for each internal reverse link if needed
   let linkCounter = 0;
-  let supLinkCounter = 0;
 
   // Loop through each anchor element
   links.forEach((link) => {
-      const { href, id } = link;
+      const { href } = link;
 
       // Convert to relative URL if the link is within the same domain
       if (href.startsWith(window.location.origin)) {
@@ -91,7 +90,7 @@ function decorateLinks(main) {
       }
 
       // Generate a unique ID for each link if it doesn't already have one
-      if (!id) {
+      if (!link.id) {
           linkCounter++;
           link.setAttribute('id', `link-${linkCounter}`);
       }
@@ -111,9 +110,8 @@ function decorateLinks(main) {
               const existingReferenceLink = parentParagraph.querySelector(`a[href="#${link.id}"]`);
 
               if (!existingReferenceLink) {
-                  // Generate a new unique ID for the reverse reference
-                  // supLinkCounter++;
-                  const reverseLinkId = `link-${linkCounter}`;
+                  // Use the existing ID of the link or the generated one
+                  const reverseLinkId = link.id;
 
                   // Create a new <a> tag to wrap the reference number
                   const referenceLink = document.createElement('a');
