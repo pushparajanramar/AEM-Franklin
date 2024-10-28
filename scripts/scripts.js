@@ -67,7 +67,7 @@ function generateId(href) {
 }
 
 function decorateLinks(main) {
-  // Get all anchor elements within the main container
+  // Get all <a> tags within the main container
   const links = main.querySelectorAll('a');
 
   // Helper function to convert absolute URLs to relative
@@ -81,11 +81,11 @@ function decorateLinks(main) {
 
   // Loop through each anchor element
   links.forEach((link) => {
-      const { href } = link;
+      const { href, id } = link;
 
-      // Proceed only if the link is within a <sup> tag
+      // Proceed only if the link is within a <sup> tag and has an id
       const supTag = link.closest('sup');
-      if (!supTag) return;
+      if (!supTag || !id) return;
 
       // Convert to relative URL if the link is within the same domain
       if (href.startsWith(window.location.origin)) {
@@ -95,9 +95,8 @@ function decorateLinks(main) {
 
       // Generate a unique id for each internal link if it doesn't already have one
       linkCounter++;
-      const uniqueId = `link-${linkCounter}`;
-      const currentId = link.id;
-      if (!currentId) {
+      const uniqueId = id || `link-${linkCounter}`;
+      if (!link.id) {
           link.setAttribute('id', uniqueId);
       }
 
@@ -105,7 +104,29 @@ function decorateLinks(main) {
       const parentParagraph = link.closest('p');
 
       if (parentParagraph) {
-          // Split the paragraph text by a period and use the first part
+          // Extract the reference number (e.g., "93.") from the beginning of the paragraph
+          const paragraphText = parentParagraph.textContent;
+          const firstSentenceMatch = paragraphText.match(/^(\d+\.)/);
+
+          if (firstSentenceMatch) {
+              const referenceNumber = firstSentenceMatch[0].trim();
+
+              // Check if there's already an <a> tag with this reference number
+              const existingReferenceLink = parentParagraph.querySelector(`a[href="#${id}"]`);
+
+              if (!existingReferenceLink) {
+                  // Create a new <a> tag to wrap the reference number
+                  const referenceLink = document.createElement('a');
+                  referenceLink.href = `#${uniqueId}`;
+                  referenceLink.textContent = referenceNumber;
+                  referenceLink.style.color = '#007bff';
+
+                  // Replace the reference number text in the paragraph with the new <a> tag
+                  parentParagraph.innerHTML = parentParagraph.innerHTML.replace(referenceNumber, referenceLink.outerHTML);
+              }
+          }
+
+          // Split the paragraph text by a period and use the first part to create a reverse link
           const firstSentence = parentParagraph.textContent.split('.')[0].trim();
 
           // Check if an existing anchor within <p> has the same first sentence as text
@@ -128,6 +149,7 @@ function decorateLinks(main) {
       }
   });
 }
+
 
 
 
