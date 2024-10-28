@@ -89,10 +89,13 @@ function decorateLinks(main) {
           link.setAttribute('href', relativeHref);
       }
 
-      // Generate a unique id for each internal link
-      linkCounter++;
-      const uniqueId = `link-${linkCounter}`;
-      link.setAttribute('id', uniqueId);
+        // Check if the <a> tag has child elements and no existing id
+        if (link.children.length > 0 && !link.hasAttribute('id')) {
+          // Generate a unique id for each internal link
+          linkCounter++;
+          const uniqueId = `link-${linkCounter}`;
+          link.setAttribute('id', uniqueId);
+      }
 
       // If the link has a hash (indicating an internal reference), add a reverse link
       if (link.hash) {
