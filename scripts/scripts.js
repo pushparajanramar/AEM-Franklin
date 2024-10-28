@@ -79,27 +79,8 @@ function decorateLinks(main) {
       
         // Set the id attribute using the existing title attribute
         if (title) {
-          link.setAttribute('id', title);
+          link.setAttribute('id', link.title);
         }
-  
-        // Check if it's an internal reference (has a hash fragment)
-        if (link.hash) {
-          const targetId = link.hash.substring(1); // Get the target ID without the '#' character
-          const targetElement = document.getElementById(targetId);
-  
-          if (targetElement) {
-              // Create a reverse reference element
-              const reverseRef = document.createElement('a');
-              reverseRef.href = `#link-${idValue}`;
-              reverseRef.textContent = '↩ Back to reference';
-              reverseRef.style.display = 'block';
-              reverseRef.style.fontSize = '0.9em';
-              reverseRef.style.color = '#007bff';
-    
-              // Append the reverse reference to the target element
-              targetElement.appendChild(reverseRef);
-            }
-          }
 
     });
 }
