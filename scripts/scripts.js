@@ -97,33 +97,25 @@ function decorateLinks(main) {
           link.setAttribute('id', uniqueId);
       }
 
-      // If the link has a hash (indicating an internal reference), add a reverse link
-      if (link.hash) {
-          const targetId = link.hash.substring(1); // Get the target ID without the '#' character
-          const targetElement = document.getElementById(targetId);
+      // Get the parent <p> tag of the current link
+      const parentParagraph = link.closest('p');
 
-          if (targetElement) {
-              // Get the paragraph after the bookmark anchor
-              const nextParagraph = targetElement.nextElementSibling;
+      // If the parent <p> exists and doesn't already contain another anchor tag
+      if (parentParagraph && parentParagraph.querySelectorAll('a').length === 1) {
+          // Split the paragraph text by a period and use the first part
+          const firstSentence = parentParagraph.textContent.split('.')[0];
 
-              // Check if the next element is a <p> tag and doesn't already contain an anchor
-              if (nextParagraph && nextParagraph.tagName === 'P' && !nextParagraph.querySelector('a')) {
-                  // Split the paragraph text by a period and use the first part
-                  const firstSentence = nextParagraph.textContent.split('.')[0];
+          if (firstSentence) {
+              // Create a reverse reference link with the first sentence as the text
+              const reverseRef = document.createElement('a');
+              reverseRef.href = `#${uniqueId}`;
+              reverseRef.textContent = firstSentence.trim();
+              reverseRef.style.display = 'block';
+              reverseRef.style.fontSize = '0.9em';
+              reverseRef.style.color = '#007bff';
 
-                  if (firstSentence) {
-                      // Create a reverse reference link only if the first sentence is valid
-                      const reverseRef = document.createElement('a');
-                      reverseRef.href = `#${uniqueId}`;
-                      reverseRef.textContent = firstSentence.trim();
-                      reverseRef.style.display = 'block';
-                      reverseRef.style.fontSize = '0.9em';
-                      reverseRef.style.color = '#007bff';
-
-                      // Insert the reverse link at the beginning of the paragraph
-                      nextParagraph.insertBefore(reverseRef, nextParagraph.firstChild);
-                  }
-              }
+              // Insert the reverse link at the beginning of the paragraph
+              parentParagraph.insertBefore(reverseRef, parentParagraph.firstChild);
           }
       }
   });
