@@ -68,10 +68,55 @@ function generateId(href) {
 
 
 
+function decorateLinks(main) {
+  // Get all anchor elements within the main container
+  const links = main.querySelectorAll('a');
 
+  // Helper function to convert absolute URLs to relative
+  function convertToRelative(href) {
+    const url = new URL(href, window.location.origin);
+    return url.pathname + url.search + url.hash;
+  }
+
+  // Counter to generate unique ids for each internal link
+  let linkCounter = 0;
+
+  // Loop through each anchor element
+  links.forEach((link) => {
+    const { href } = link;
+
+    // Convert to relative URL if the link is within the same domain
+    if (href.startsWith(window.location.origin)) {
+      const relativeHref = convertToRelative(href);
+      link.setAttribute('href', relativeHref);
+    }
+
+    // Only generate a unique id if the link does not already have one
+    if (!link.hasAttribute('id')) {
+      linkCounter++;
+      const uniqueId = `link-${linkCounter}`;
+      link.setAttribute('id', uniqueId);
+    }
+
+    // If the link has a hash (indicating an internal reference), add a reverse link only if none exist
+    if (link.hash) {
+      const targetId = link.hash.substring(1); // Get the target ID without the '#' character
+      const targetElement = document.getElementById(targetId);
+
+      if (targetElement) {
+        // Check if any reverse links with href starting with "#link" already exist in the target element
+        const reverseLinkExists = Array.from(targetElement.querySelectorAll('a.reverse-link')).some(
+          (existingLink) => existingLink.getAttribute('href').startsWith('#link')
+        );
+
+        if (!reverseLinkExists) {
           // Create a reverse reference link only if it doesn't exist
           const reverseRef = document.createElement('a');
           reverseRef.href = `#${link.id}`; // Use the existing or newly set id as the reverse reference
+
+
+          // Append the reverse reference to the target element
+          targetElement.appendChild(reverseRef);
 
           // Additional functionality for reverse linking in the enclosing paragraph
           const parentParagraph = link.closest('p');
@@ -84,35 +129,26 @@ function generateId(href) {
             if (firstSentenceMatch) {
               const referenceNumber = firstSentenceMatch[0].trim();
 
-              // Create the anchor link for the reference number
-              const referenceLink = document.createElement('a');
-              referenceLink.href = `#${link.id}`;
-              referenceLink.textContent = referenceNumber;
-              referenceLink.style.color = '#007bff';
+                // Replace only the reference number in the paragraph
+                const remainingText = paragraphText.replace(referenceNumber, '').trim();
+                parentParagraph.innerHTML = `${referenceLink.outerHTML} ${remainingText}`;
+              }
 
-              // Remaining text after the first period
-              const remainingText = paragraphText.replace(referenceNumber, '').trim();
+              reverseRef.textContent = 'referenceNumber';
+              reverseRef.classList.add('reverse-link'); // Add a specific class for easy identification
+              reverseRef.style.display = 'block';
+              reverseRef.style.fontSize = '0.9em';
+              reverseRef.style.color = '#007bff';
 
-              // Update the paragraph content
-              parentParagraph.innerHTML = `${referenceLink.outerHTML} ${remainingText}`;
             }
           }
-
-          // Set the reverse link's text and styling
-          reverseRef.textContent = '↩ Back to reference';
-          reverseRef.classList.add('reverse-link'); // Add a specific class for easy identification
-          reverseRef.style.display = 'block';
-          reverseRef.style.fontSize = '0.9em';
-          reverseRef.style.color = '#007bff';
-
-          // Append the reverse reference to the target element
-          targetElement.appendChild(reverseRef);
         }
       }
     }
+
+
   });
 }
-
 
 
 
