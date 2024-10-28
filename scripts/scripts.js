@@ -94,12 +94,7 @@ function decorateLinks(main) {
       const uniqueId = `link-${linkCounter}`;
       const currentId = link.id;
       if (!currentId) {
-          // ID is either null or empty
-          console.log("ID is null or empty");
           link.setAttribute('id', uniqueId);
-      } else {
-          // ID has a value
-          console.log("ID:", currentId);
       }
 
       // If the link has a hash (indicating an internal reference), add a reverse link
@@ -108,26 +103,32 @@ function decorateLinks(main) {
           const targetElement = document.getElementById(targetId);
 
           if (targetElement) {
-              // Check if a reverse link with the specific href already exists in the target element
-              const reverseLinkSelector = `a[href="#${uniqueId}"]`;
-              const existingReverseLink = targetElement.querySelector(reverseLinkSelector);
+              // Get the paragraph after the bookmark anchor
+              const nextParagraph = targetElement.nextElementSibling;
 
-              if (!existingReverseLink) {
-                  // Create a reverse reference link only if it doesn't exist
-                  const reverseRef = document.createElement('a');
-                  reverseRef.href = `#${uniqueId}`; // Use the unique id as the reverse reference
-                  reverseRef.textContent = `#${uniqueId}`;
-                  reverseRef.style.display = 'block';
-                  reverseRef.style.fontSize = '0.9em';
-                  reverseRef.style.color = '#007bff';
+              // Check if the next element is a <p> tag and doesn't already contain an anchor
+              if (nextParagraph && nextParagraph.tagName === 'P' && !nextParagraph.querySelector('a')) {
+                  // Split the paragraph text by a period and use the first part
+                  const firstSentence = nextParagraph.textContent.split('.')[0];
 
-                  // Append the reverse reference to the target element
-                  targetElement.appendChild(reverseRef);
+                  if (firstSentence) {
+                      // Create a reverse reference link only if the first sentence is valid
+                      const reverseRef = document.createElement('a');
+                      reverseRef.href = `#${uniqueId}`;
+                      reverseRef.textContent = firstSentence.trim();
+                      reverseRef.style.display = 'block';
+                      reverseRef.style.fontSize = '0.9em';
+                      reverseRef.style.color = '#007bff';
+
+                      // Insert the reverse link at the beginning of the paragraph
+                      nextParagraph.insertBefore(reverseRef, nextParagraph.firstChild);
+                  }
               }
           }
       }
   });
 }
+
 
 /**
  * Decorates the main element.
