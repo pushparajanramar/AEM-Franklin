@@ -103,16 +103,15 @@ function decorateLinks(main) {
           const targetElement = document.getElementById(targetId);
 
           if (targetElement) {
-              // Check if any reverse links already exist within the target element
-              const reverseLinkExists = Array.from(targetElement.querySelectorAll('a')).some(
-                  (existingLink) => existingLink.getAttribute('href') === `#${link.id}`
-              );
+              // Check if any reverse links with the class 'reverse-link' already exist in the target element
+              const reverseLinkExists = targetElement.querySelector(`a.reverse-link[href="#${link.id}"]`);
 
               if (!reverseLinkExists) {
                   // Create a reverse reference link only if it doesn't exist
                   const reverseRef = document.createElement('a');
                   reverseRef.href = `#${link.id}`; // Use the existing or newly set id as the reverse reference
                   reverseRef.textContent = '↩ Back to reference';
+                  reverseRef.classList.add('reverse-link'); // Add a specific class for easy identification
                   reverseRef.style.display = 'block';
                   reverseRef.style.fontSize = '0.9em';
                   reverseRef.style.color = '#007bff';
@@ -148,6 +147,7 @@ function decorateLinks(main) {
       }
   });
 }
+
 
 
 
