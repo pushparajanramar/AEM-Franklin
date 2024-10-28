@@ -74,8 +74,8 @@ function decorateLinks(main) {
 
   // Helper function to convert absolute URLs to relative
   function convertToRelative(href) {
-      const url = new URL(href, window.location.origin);
-      return url.pathname + url.search + url.hash;
+    const url = new URL(href, window.location.origin);
+    return url.pathname + url.search + url.hash;
   }
 
   // Counter to generate unique ids for each internal link and backlinks
@@ -83,45 +83,61 @@ function decorateLinks(main) {
 
   // Loop through each anchor element
   links.forEach((link) => {
-      const { href } = link;
+    const { href } = link;
 
-      // Convert to relative URL if the link is within the same domain
-      if (href.startsWith(window.location.origin)) {
-          const relativeHref = convertToRelative(href);
-          link.setAttribute('href', relativeHref);
-      }
+    // Convert to relative URL if the link is within the same domain
+    if (href.startsWith(window.location.origin)) {
+      const relativeHref = convertToRelative(href);
+      link.setAttribute('href', relativeHref);
+    }
 
-      // Only generate a unique id if the link does not already have one
-      if (!link.hasAttribute('id')) {
-          linkCounter++;
-          const uniqueId = `link-${linkCounter}`;
-          link.setAttribute('id', uniqueId);
-      }
-    
-      // Check for the existence of an enclosing paragraph
-      const parentParagraph = link.closest('p');
-      if (parentParagraph) {
-          const paragraphText = parentParagraph.textContent;
+    // Only generate a unique id if the link does not already have one
+    if (!link.hasAttribute('id')) {
+      linkCounter++;
+      const uniqueId = `link-${linkCounter}`;
+      link.setAttribute('id', uniqueId);
+    }
 
-          // Regular expression to match the first numeric prefix followed by a period, e.g., "2."
-          const firstSentenceMatch = paragraphText.match(/^(\d+\.)/);
+    // If the link has a hash (indicating an internal reference), add a reverse link only if none exist
+    if (link.hash) {
+      const targetId = link.hash.substring(1); // Get the target ID without the '#' character
+      const targetElement = document.getElementById(targetId);
 
-          if (firstSentenceMatch) {
+      if (targetElement) {
+        // Check if any reverse links with href starting with "#link" already exist in the target element
+        const reverseLinkExists = Array.from(targetElement.querySelectorAll('a.reverse-link')).some(
+          (existingLink) => existingLink.getAttribute('href').startsWith('#link')
+        );
+
+        if (!reverseLinkExists) {
+          // Check for the existence of an enclosing paragraph
+          const parentParagraph = link.closest('p');
+          if (parentParagraph) {
+            const paragraphText = parentParagraph.textContent;
+
+            // Regular expression to match the first numeric prefix followed by a period, e.g., "2."
+            const firstSentenceMatch = paragraphText.match(/^(\d+\.)/);
+
+            if (firstSentenceMatch) {
               const referenceNumber = firstSentenceMatch[0].trim();
               const existingReferenceLink = parentParagraph.querySelector(`a[href="#${link.id}"]`);
 
               if (!existingReferenceLink) {
-                  // Create a backlink reference at the beginning of the paragraph
-                  const backlink = document.createElement('a');
-                  backlink.href = `#${'+uniqueId+'}`;
-                  backlink.textContent = referenceNumber;
-                  backlink.style.color = '#007bff';
+                // Create a backlink reference at the beginning of the paragraph
+                const backlink = document.createElement('a');
+                backlink.href = `#${link.id}`;
+                backlink.textContent = referenceNumber;
+                backlink.style.color = '#007bff';
 
-                  // Add the backlink reference to the start of the paragraph content
-                  parentParagraph.innerHTML = `${backlink.outerHTML} ${paragraphText.replace(referenceNumber, '')}`;
+                // Add the backlink reference to the start of the paragraph content
+                parentParagraph.innerHTML = `${backlink.outerHTML} ${paragraphText.replace(referenceNumber, '')}`;
               }
+            }
           }
+        }
       }
+    }
+
   });
 }
 
