@@ -83,6 +83,10 @@ function decorateLinks(main) {
   links.forEach((link) => {
       const { href } = link;
 
+      // Proceed only if the link is within a <sup> tag
+      const supTag = link.closest('sup');
+      if (!supTag) return;
+
       // Convert to relative URL if the link is within the same domain
       if (href.startsWith(window.location.origin)) {
           const relativeHref = convertToRelative(href);
@@ -124,6 +128,7 @@ function decorateLinks(main) {
       }
   });
 }
+
 
 
 
