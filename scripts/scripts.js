@@ -75,6 +75,9 @@ function decorateLinks(main) {
         const url = new URL(href, window.location.origin);
         return url.pathname + url.search + url.hash;
     }
+
+    // Counter to generate unique ids for each internal link
+    let linkCounter = 0;
     
     // Loop through each anchor element
     links.forEach((link) => {
@@ -86,10 +89,10 @@ function decorateLinks(main) {
             link.setAttribute('href', relativeHref);
         }
 
-        // Set the id attribute using the existing title attribute
-        if (title) {
-            link.setAttribute('id', title);
-        }
+        // Generate a unique id for each internal link
+        linkCounter++;
+        const uniqueId = `link-${linkCounter}`;
+        link.setAttribute('id', uniqueId);
 
         // If the link has a hash (indicating an internal reference), add a reverse link
         if (link.hash) {
@@ -97,13 +100,14 @@ function decorateLinks(main) {
             const targetElement = document.getElementById(targetId);
 
             if (targetElement) {
-                // Check if a reverse link already exists
-                const existingReverseLink = targetElement.querySelector(`a[href="#${link.id || title}"]`);
+                // Check if a reverse link with the specific href already exists in the target element
+                const reverseLinkSelector = `a[href="#${uniqueId}"]`;
+                const existingReverseLink = targetElement.querySelector(reverseLinkSelector);
                 
                 if (!existingReverseLink) {
                     // Create a reverse reference link only if it doesn't exist
                     const reverseRef = document.createElement('a');
-                    reverseRef.href = `#${link.id || title}`; // Use the link's id as the reverse reference
+                    reverseRef.href = `#${uniqueId}`; // Use the unique id as the reverse reference
                     reverseRef.textContent = '↩ Back to reference';
                     reverseRef.style.display = 'block';
                     reverseRef.style.fontSize = '0.9em';
@@ -116,7 +120,6 @@ function decorateLinks(main) {
         }
     });
 }
-
 
 /**
  * Decorates the main element.
