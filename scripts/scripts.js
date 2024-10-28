@@ -98,57 +98,28 @@ function decorateLinks(main) {
       link.setAttribute('id', uniqueId);
     }
 
-    // If the link has a hash (indicating an internal reference), add a reverse link only if none exist
-    if (link.hash) {
-      const targetId = link.hash.substring(1); // Get the target ID without the '#' character
-      const targetElement = document.getElementById(targetId);
+    // Additional functionality for reverse linking in the enclosing paragraph
+    const parentParagraph = link.closest('p');
+    if (parentParagraph) {
+      const paragraphText = parentParagraph.textContent;
 
-      if (targetElement) {
-        // Check if any reverse links with href starting with "#link" already exist in the target element
-        const reverseLinkExists = Array.from(targetElement.querySelectorAll('a.reverse-link')).some(
-          (existingLink) => existingLink.getAttribute('href').startsWith('#link')
-        );
+      // Regular expression to match the first numeric prefix followed by a period, e.g., "5."
+      const firstSentenceMatch = paragraphText.match(/^(\d+\.)/);
 
-        if (!reverseLinkExists) {
-          // Create a reverse reference link only if it doesn't exist
-          const reverseRef = document.createElement('a');
-          reverseRef.href = `#${link.id}`; // Use the existing or newly set id as the reverse reference
+      if (firstSentenceMatch) {
+        const referenceNumber = firstSentenceMatch[0].trim();
 
-          // Additional functionality for reverse linking in the enclosing paragraph
-          const parentParagraph = link.closest('p');
-          if (parentParagraph) {
-            const paragraphText = parentParagraph.textContent;
+        // Create the anchor link for the reference number
+        const referenceLink = document.createElement('a');
+        referenceLink.href = `#${link.id}`;
+        referenceLink.textContent = referenceNumber;
+        referenceLink.style.color = '#007bff';
 
-            // Regular expression to match the first numeric prefix followed by a period, e.g., "3."
-            const firstSentenceMatch = paragraphText.match(/^(\d+\.)/);
+        // Remaining text after the reference number
+        const remainingText = paragraphText.replace(referenceNumber, '').trim();
 
-            if (firstSentenceMatch) {
-              const referenceNumber = firstSentenceMatch[0].trim();
-
-              // Create the anchor link for the reference number
-              const referenceLink = document.createElement('a');
-              referenceLink.href = `#${link.id}`;
-              referenceLink.textContent = referenceNumber;
-              referenceLink.style.color = '#007bff';
-
-              // Remaining text after the first period
-              const remainingText = paragraphText.replace(referenceNumber, '').trim();
-
-              // Update the paragraph content
-              parentParagraph.innerHTML = `${referenceLink.outerHTML} ${remainingText}`;
-            }
-          }
-
-          // Set the reverse link's text and styling
-          reverseRef.textContent = '↩ Back to reference';
-          reverseRef.classList.add('reverse-link'); // Add a specific class for easy identification
-          reverseRef.style.display = 'block';
-          reverseRef.style.fontSize = '0.9em';
-          reverseRef.style.color = '#007bff';
-
-          // Append the reverse reference to the target element
-          targetElement.appendChild(reverseRef);
-        }
+        // Update the paragraph content
+        parentParagraph.innerHTML = `${referenceLink.outerHTML} ${remainingText}`;
       }
     }
   });
