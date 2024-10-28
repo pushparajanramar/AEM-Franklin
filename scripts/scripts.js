@@ -71,15 +71,15 @@ function decorateLinks(main) {
     const links = main.querySelectorAll('a');
     // Loop through each anchor element and add a target based on the business condition
     links.forEach((link) => {
-        const { href, title } = link;
+        const { href } = link;
+        const { id } = generateId(href);
         // Convert to relative URL if the link is within the same domain
         if (href.startsWith(window.location.origin)) {
             link.setAttribute('href', convertToRelative(href));
         }
       
-        // Set the id attribute using the existing title attribute
-        if (title) {
-          link.setAttribute('id', link.title);
+        if (id) {
+          link.setAttribute('id', id);
         }
 
     });
