@@ -67,67 +67,66 @@ function generateId(href) {
 }
 
 function decorateLinks(main) {
-    // Get all anchor elements within the main container
-    const links = main.querySelectorAll('a');
-    
-    // Helper function to convert absolute URLs to relative
-    function convertToRelative(href) {
-        const url = new URL(href, window.location.origin);
-        return url.pathname + url.search + url.hash;
-    }
+  // Get all anchor elements within the main container
+  const links = main.querySelectorAll('a');
 
-    // Counter to generate unique ids for each internal link
-    let linkCounter = 0;
-    
-    // Loop through each anchor element
-    links.forEach((link) => {
-        const { href, title } = link;
+  // Helper function to convert absolute URLs to relative
+  function convertToRelative(href) {
+      const url = new URL(href, window.location.origin);
+      return url.pathname + url.search + url.hash;
+  }
 
-        // Convert to relative URL if the link is within the same domain
-        if (href.startsWith(window.location.origin)) {
-            const relativeHref = convertToRelative(href);
-            link.setAttribute('href', relativeHref);
-        }
+  // Counter to generate unique ids for each internal link
+  let linkCounter = 0;
 
-        // Generate a unique id for each internal link
-        linkCounter++;
-        const uniqueId = `link-${linkCounter}`;
-        const currentId = link.id;
-        if (id === null || id === "") {
+  // Loop through each anchor element
+  links.forEach((link) => {
+      const { href } = link;
+
+      // Convert to relative URL if the link is within the same domain
+      if (href.startsWith(window.location.origin)) {
+          const relativeHref = convertToRelative(href);
+          link.setAttribute('href', relativeHref);
+      }
+
+      // Generate a unique id for each internal link if it doesn't already have one
+      linkCounter++;
+      const uniqueId = `link-${linkCounter}`;
+      const currentId = link.id;
+      if (!currentId) {
           // ID is either null or empty
           console.log("ID is null or empty");
           link.setAttribute('id', uniqueId);
-        } else {
+      } else {
           // ID has a value
-          console.log("ID:", id);
-        }
-        
-      
-        // If the link has a hash (indicating an internal reference), add a reverse link
-        if (link.hash) {
-            const targetId = link.hash.substring(1); // Get the target ID without the '#' character
-            const targetElement = document.getElementById(targetId);
+          console.log("ID:", currentId);
+      }
 
-            if (targetElement) {
-                // Check if a reverse link with the specific href already exists in the target element
-                const reverseLinkSelector = `a[href="#${uniqueId}"]`;
-                const existingReverseLink = targetElement.querySelector(reverseLinkSelector);
-                
-                if (!existingReverseLink) {
-                    // Create a reverse reference link only if it doesn't exist
-                    const reverseRef = document.createElement('a');
-                    reverseRef.href = `#${uniqueId}`; // Use the unique id as the reverse reference
-                    reverseRef.textContent = '↩ Back to reference';
-                    reverseRef.style.display = 'block';
-                    reverseRef.style.fontSize = '0.9em';
-                    reverseRef.style.color = '#007bff';
+      // If the link has a hash (indicating an internal reference), add a reverse link
+      if (link.hash) {
+          const targetId = link.hash.substring(1); // Get the target ID without the '#' character
+          const targetElement = document.getElementById(targetId);
 
-                    // Append the reverse reference to the target element
-                    targetElement.appendChild(reverseRef);
-                }
-            }
-        }
-    });
+          if (targetElement) {
+              // Check if a reverse link with the specific href already exists in the target element
+              const reverseLinkSelector = `a[href="#${uniqueId}"]`;
+              const existingReverseLink = targetElement.querySelector(reverseLinkSelector);
+
+              if (!existingReverseLink) {
+                  // Create a reverse reference link only if it doesn't exist
+                  const reverseRef = document.createElement('a');
+                  reverseRef.href = `#${uniqueId}`; // Use the unique id as the reverse reference
+                  reverseRef.textContent = '↩ Back to reference';
+                  reverseRef.style.display = 'block';
+                  reverseRef.style.fontSize = '0.9em';
+                  reverseRef.style.color = '#007bff';
+
+                  // Append the reverse reference to the target element
+                  targetElement.appendChild(reverseRef);
+              }
+          }
+      }
+  });
 }
 
 /**
