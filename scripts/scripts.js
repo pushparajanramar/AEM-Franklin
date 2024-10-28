@@ -78,6 +78,7 @@ function decorateLinks(main) {
 
   // Counter to generate unique ids for each internal reverse link
   let linkCounter = 0;
+  let supLinkCounter = 0;
 
   // Loop through each anchor element
   links.forEach((link) => {
@@ -99,8 +100,8 @@ function decorateLinks(main) {
       const supTag = link.querySelector('sup');
       if (supTag && !supTag.querySelector('a')) {
           // Increment the counter to create a unique link ID for the <sup> reference
-          linkCounter++;
-          const supLinkId = `sup-link-${linkCounter}`;
+          supLinkCounter++;
+          const supLinkId = `sup-link-${supLinkCounter}`;
 
           // Create a new <a> tag around the content of <sup>
           const newLink = document.createElement('a');
@@ -129,8 +130,8 @@ function decorateLinks(main) {
 
               if (!existingReferenceLink) {
                   // Generate a new unique ID for the reverse reference
-                  linkCounter++;
-                  const reverseLinkId = `sup-link-${linkCounter}`;
+                  supLinkCounter++;
+                  const reverseLinkId = `sup-link-${supLinkCounter}`;
 
                   // Create a new <a> tag to wrap the reference number
                   const referenceLink = document.createElement('a');
