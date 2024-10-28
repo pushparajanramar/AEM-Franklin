@@ -130,7 +130,7 @@ function decorateLinks(main) {
 
               if (!existingReferenceLink) {
                   // Generate a new unique ID for the reverse reference
-                  supLinkCounter++;
+                  // supLinkCounter++;
                   const reverseLinkId = `sup-link-${supLinkCounter}`;
 
                   // Create a new <a> tag to wrap the reference number
