@@ -66,6 +66,8 @@ function generateId(href) {
   return url.pathname.replace(/[^\w-]+/g, '_') + url.search.replace(/[^\w-]+/g, '_') + url.hash.replace(/[^\w-]+/g, '_');
 }
 
+
+
 function decorateLinks(main) {
   // Get all anchor elements within the main container
   const links = main.querySelectorAll('a');
@@ -117,8 +119,8 @@ function decorateLinks(main) {
                   reverseRef.style.fontSize = '0.9em';
                   reverseRef.style.color = '#007bff';
 
-                  // Append the reverse reference to the target element
-                  targetElement.appendChild(reverseRef);
+                  // Insert the reverse reference link after the target element
+                  targetElement.insertAdjacentElement('afterend', reverseRef);
               }
           }
       }
@@ -141,13 +143,14 @@ function decorateLinks(main) {
                   referenceLink.textContent = referenceNumber;
                   referenceLink.style.color = '#007bff';
 
-                  // Insert the reference link at the start of the paragraph content
+                  // Insert the reference link at the start of the paragraph content, replacing the original reference number
                   parentParagraph.innerHTML = `${referenceLink.outerHTML} ${paragraphText.replace(referenceNumber, '')}`;
               }
           }
       }
   });
 }
+
 
 
 
