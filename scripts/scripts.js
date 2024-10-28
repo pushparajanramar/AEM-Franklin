@@ -70,6 +70,9 @@ function decorateLinks(main) {
         if (href.startsWith(window.location.origin)) {
             link.setAttribute('href', convertToRelative(href));
         }
+        // Add an id attribute based on the relative URL
+        const idValue = relativeHref.replace(/[^\w-]+/g, '_'); // Create a valid id by replacing invalid characters
+        link.setAttribute('id', `link-${idValue}`);
 
     });
 }
