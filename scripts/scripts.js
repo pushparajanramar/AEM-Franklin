@@ -87,39 +87,40 @@ function decorateLinks(main) {
           link.setAttribute('href', relativeHref);
       }
 
-      // Ensure the link has a unique ID; if not, generate one
-      if (!id) {
-          link.id = `bookmark-${Math.random().toString(36).substr(2, 9)}`;
+      // Check if the <a> tag has a <sup> child and lacks an ID
+      const hasSupChild = link.querySelector('sup') !== null;
+      if (hasSupChild && !id) {
+          // Extract the portion after "#" in the href as the ID
+          const hashIndex = href.indexOf('#');
+          if (hashIndex !== -1) {
+              const extractedId = href.substring(hashIndex + 1);
+              link.id = extractedId;  // Set the extracted part as the id
+          }
       }
 
-      // Get the closest paragraph and modify the first sentence reference if needed
+      // Additional functionality for reverse linking, as before
       const parentParagraph = link.closest('p');
-
       if (parentParagraph) {
-          // Extract the reference number (e.g., "2.") from the beginning of the paragraph
           const paragraphText = parentParagraph.textContent;
           const firstSentenceMatch = paragraphText.match(/^(\d+\.)/);
 
           if (firstSentenceMatch) {
               const referenceNumber = firstSentenceMatch[0].trim();
-
-              // Check if there's already an <a> tag with this reference number at the beginning of the paragraph
               const existingReferenceLink = parentParagraph.querySelector(`a[href="#${link.id}"]`);
 
               if (!existingReferenceLink) {
-                  // Create a new <a> tag to wrap the reference number, pointing to the bookmark's unique ID
                   const referenceLink = document.createElement('a');
                   referenceLink.href = `#${link.id}`;
                   referenceLink.textContent = referenceNumber;
                   referenceLink.style.color = '#007bff';
 
-                  // Prepend the reference link to the paragraph and remove the original reference number
                   parentParagraph.innerHTML = referenceLink.outerHTML + paragraphText.replace(referenceNumber, '');
               }
           }
       }
   });
 }
+
 
 
 
