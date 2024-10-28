@@ -76,16 +76,16 @@ function decorateLinks(main) {
       return url.pathname + url.search + url.hash;
   }
 
-  // Counter to generate unique ids for each internal link
+  // Counter to generate unique ids for each internal reverse link
   let linkCounter = 0;
 
   // Loop through each anchor element
   links.forEach((link) => {
-      const { href, id } = link;
+      const { href, id, title } = link;
 
-      // Proceed only if the link is within a <sup> tag and has an id
-      const supTag = link.closest('sup');
-      if (!supTag || !id) return;
+      // Proceed only if the <a> tag has a <sup> child
+      const supTag = link.querySelector('sup');
+      if (!supTag) return;
 
       // Convert to relative URL if the link is within the same domain
       if (href.startsWith(window.location.origin)) {
@@ -100,7 +100,20 @@ function decorateLinks(main) {
           link.setAttribute('id', uniqueId);
       }
 
-      // Get the parent <p> tag of the current link
+      // Check if there's already an anchor inside <sup>
+      if (!supTag.querySelector('a')) {
+          // Create a new <a> tag around the content of <sup>
+          const newLink = document.createElement('a');
+          newLink.href = `#${uniqueId}`;
+          newLink.textContent = supTag.textContent.trim();
+          newLink.style.color = '#007bff'; // Optional styling for visibility
+
+          // Clear the original <sup> content and append the new <a> tag
+          supTag.innerHTML = '';
+          supTag.appendChild(newLink);
+      }
+
+      // Additional functionality: Get the parent <p> tag of the current link
       const parentParagraph = link.closest('p');
 
       if (parentParagraph) {
@@ -112,7 +125,7 @@ function decorateLinks(main) {
               const referenceNumber = firstSentenceMatch[0].trim();
 
               // Check if there's already an <a> tag with this reference number
-              const existingReferenceLink = parentParagraph.querySelector(`a[href="#${id}"]`);
+              const existingReferenceLink = parentParagraph.querySelector(`a[href="#${uniqueId}"]`);
 
               if (!existingReferenceLink) {
                   // Create a new <a> tag to wrap the reference number
@@ -126,16 +139,13 @@ function decorateLinks(main) {
               }
           }
 
-          // Split the paragraph text by a period and use the first part to create a reverse link
+          // Create a reverse link based on the first sentence of the paragraph text
           const firstSentence = parentParagraph.textContent.split('.')[0].trim();
-
-          // Check if an existing anchor within <p> has the same first sentence as text
           const existingLink = Array.from(parentParagraph.querySelectorAll('a')).find(
               (a) => a.textContent.trim() === firstSentence
           );
 
           if (!existingLink && firstSentence) {
-              // Create a reverse reference link only if it doesn't exist
               const reverseRef = document.createElement('a');
               reverseRef.href = `#${uniqueId}`;
               reverseRef.textContent = firstSentence;
@@ -143,7 +153,6 @@ function decorateLinks(main) {
               reverseRef.style.fontSize = '0.9em';
               reverseRef.style.color = '#007bff';
 
-              // Insert the reverse link at the beginning of the paragraph
               parentParagraph.insertBefore(reverseRef, parentParagraph.firstChild);
           }
       }
