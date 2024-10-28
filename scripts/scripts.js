@@ -68,88 +68,54 @@ function generateId(href) {
 
 
 function decorateLinks(main) {
-  // Get all anchor elements within the main container
   const links = main.querySelectorAll('a');
   
-  // Helper function to convert absolute URLs to relative
   function convertToRelative(href) {
+      if (!href.startsWith(window.location.origin)) return href; // Already relative
       const url = new URL(href, window.location.origin);
       return url.pathname + url.search + url.hash;
   }
 
-  // Counter to generate unique ids for each internal link
   let linkCounter = 0;
-  
-  // Loop through each anchor element
-  links.forEach((link) => {
-      const { href } = link;
 
-      // Convert to relative URL if the link is within the same domain
+  links.forEach((link) => {
+      const { href, hash } = link;
+
+      // Convert to relative URL if within the same domain
       if (href.startsWith(window.location.origin)) {
-          const relativeHref = convertToRelative(href);
-          link.setAttribute('href', relativeHref);
+          link.setAttribute('href', convertToRelative(href));
       }
 
-      // Only generate a unique id if the link does not already have one
+      // Add unique ID if not present
       if (!link.hasAttribute('id')) {
           linkCounter++;
-          const uniqueId = `link-${linkCounter}`;
-          link.setAttribute('id', uniqueId);
+          link.setAttribute('id', `link-${linkCounter}`);
       }
       
-      // If the link has a hash (indicating an internal reference), add a reverse link only if none exist
-      if (link.hash) {
-          const targetId = link.hash.substring(1); // Get the target ID without the '#' character
+      // If the link has a hash (internal reference)
+      if (hash) {
+          const targetId = hash.slice(1); // Remove '#' from the hash
           const targetElement = document.getElementById(targetId);
 
           if (targetElement) {
-              // Check if any reverse links with href starting with "#link" already exist in the target element
-              const reverseLinkExists = Array.from(targetElement.querySelectorAll('a.reverse-link')).some(
-                  (existingLink) => existingLink.getAttribute('href').startsWith('#link')
-              );
+              // Match and wrap the citation number with a reverse link
+              const citationText = targetElement.textContent;
+              const firstSentenceMatch = citationText.match(/^(\d+\.)/);
 
-              if (!reverseLinkExists) {
-                  // Create a reverse reference link only if it doesn't exist
-                  const reverseRef = document.createElement('a');
-                  reverseRef.href = `#${link.id}`; // Use the existing or newly set id as the reverse reference
-                  reverseRef.textContent = '↩ Back to reference';
-                  reverseRef.classList.add('reverse-link'); // Add a specific class for easy identification
-                  reverseRef.style.display = 'block';
-                  reverseRef.style.fontSize = '0.9em';
-                  reverseRef.style.color = '#007bff';
+              if (firstSentenceMatch) {
+                  const referenceNumber = firstSentenceMatch[0].trim();
+                  const reverseLink = document.createElement('a');
+                  reverseLink.href = `#${link.id}`;
+                  reverseLink.textContent = referenceNumber;
+                  reverseLink.classList.add('reference-link'); // Add class for styling
 
-                  // Append the reverse reference to the target element
-                  targetElement.appendChild(reverseRef);
-              }
-          }
-      }
-
-      // Additional functionality for reverse linking in the enclosing paragraph
-      const parentParagraph = link.closest('p');
-      if (parentParagraph) {
-          const paragraphText = parentParagraph.textContent;
-
-          // Regular expression to match the first numeric prefix followed by a period, e.g., "1."
-          const firstSentenceMatch = paragraphText.match(/^(\d+\.)/);
-
-          if (firstSentenceMatch) {
-              const referenceNumber = firstSentenceMatch[0].trim();
-              const existingReferenceLink = parentParagraph.querySelector(`a[href="#${link.id}"]`);
-
-              if (!existingReferenceLink) {
-                  const referenceLink = document.createElement('a');
-                  referenceLink.href = `#${link.id}`;
-                  referenceLink.textContent = referenceNumber;
-                  referenceLink.style.color = '#007bff';
-
-                  // Insert the reference link at the start of the paragraph content
-                  parentParagraph.innerHTML = `${referenceLink.outerHTML} ${paragraphText.replace(referenceNumber, '')}`;
+                  // Wrap the reference number in the target paragraph with reverse link
+                  targetElement.innerHTML = `${reverseLink.outerHTML} ${citationText.replace(referenceNumber, '')}`;
               }
           }
       }
   });
 }
-
 
 
 
