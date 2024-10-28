@@ -90,50 +90,47 @@ function decorateLinks(main) {
       }
 
       // Generate a unique ID for each link if it doesn't already have one
-      //if (!id) {
-      //    linkCounter++;
-      //    link.setAttribute('id', `link-${linkCounter}`);
-      //}
+      if (!id) {
+          linkCounter++;
+          link.setAttribute('id', `link-${linkCounter}`);
+      }
 
-      // Proceed only if the <a> tag has a <sup> child and is not an internal reference
+      // Proceed only if the <a> tag has a <sup> child and does not already contain a link
       const supTag = link.querySelector('sup');
-      if (supTag && !href.startsWith('#')) {
-          // Skip if <sup> already contains an <a> tag
-          if (!supTag.querySelector('a')) {
-              // Generate a unique link for the <sup> element
-              linkCounter++;
-              const newLinkId = `sup-link-${linkCounter}`;
+      if (supTag && !supTag.querySelector('a')) {
+          // Increment the counter to create a unique link ID for the <sup> reference
+          linkCounter++;
+          const supLinkId = `sup-link-${linkCounter}`;
 
-              // Create a new <a> tag around the content of <sup>
-              const newLink = document.createElement('a');
-              newLink.href = `#${newLinkId}`;
-              newLink.textContent = supTag.textContent.trim();
-              newLink.style.color = '#007bff'; // Optional styling for visibility
+          // Create a new <a> tag around the content of <sup>
+          const newLink = document.createElement('a');
+          newLink.href = `#${supLinkId}`;
+          newLink.textContent = supTag.textContent.trim();
+          newLink.style.color = '#007bff'; // Optional styling for visibility
 
-              // Clear the original <sup> content and append the new <a> tag
-              supTag.innerHTML = '';
-              supTag.appendChild(newLink);
-          }
+          // Clear the original <sup> content and append the new <a> tag
+          supTag.innerHTML = '';
+          supTag.appendChild(newLink);
       }
 
       // Additional functionality: Get the parent <p> tag of the current link
       const parentParagraph = link.closest('p');
 
       if (parentParagraph) {
-          // Extract the reference number (e.g., "6.") from the beginning of the paragraph
+          // Extract the reference number (e.g., "2.") from the beginning of the paragraph
           const paragraphText = parentParagraph.textContent;
           const firstSentenceMatch = paragraphText.match(/^(\d+\.)/);
 
           if (firstSentenceMatch) {
               const referenceNumber = firstSentenceMatch[0].trim();
 
-              // Check if there's already an <a> tag with this reference number
+              // Check if there's already an <a> tag with this reference number at the beginning of the paragraph
               const existingReferenceLink = parentParagraph.querySelector(`a[href="#${link.id}"]`);
 
               if (!existingReferenceLink) {
                   // Generate a new unique ID for the reverse reference
                   linkCounter++;
-                  const reverseLinkId = `link-${linkCounter}`;
+                  const reverseLinkId = `sup-link-${linkCounter}`;
 
                   // Create a new <a> tag to wrap the reference number
                   const referenceLink = document.createElement('a');
@@ -145,28 +142,10 @@ function decorateLinks(main) {
                   parentParagraph.innerHTML = parentParagraph.innerHTML.replace(referenceNumber, referenceLink.outerHTML);
               }
           }
-
-          // Create a reverse link based on the first sentence of the paragraph text
-          const firstSentence = parentParagraph.textContent.split('.')[0].trim();
-          const existingLink = Array.from(parentParagraph.querySelectorAll('a')).find(
-              (a) => a.textContent.trim() === firstSentence
-          );
-
-          if (!existingLink && firstSentence) {
-              // Generate a new unique ID for the reverse link
-              linkCounter++;
-              const reverseRef = document.createElement('a');
-              reverseRef.href = `#link-${linkCounter}`;
-              reverseRef.textContent = firstSentence;
-              reverseRef.style.display = 'block';
-              reverseRef.style.fontSize = '0.9em';
-              reverseRef.style.color = '#007bff';
-
-              parentParagraph.insertBefore(reverseRef, parentParagraph.firstChild);
-          }
       }
   });
 }
+
 
 
 
