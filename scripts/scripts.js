@@ -116,7 +116,7 @@ function decorateLinks(main) {
                   // Create a reverse reference link only if it doesn't exist
                   const reverseRef = document.createElement('a');
                   reverseRef.href = `#${uniqueId}`; // Use the unique id as the reverse reference
-                  reverseRef.textContent = '↩ Back to reference';
+                  reverseRef.textContent = `#${uniqueId}`;
                   reverseRef.style.display = 'block';
                   reverseRef.style.fontSize = '0.9em';
                   reverseRef.style.color = '#007bff';
