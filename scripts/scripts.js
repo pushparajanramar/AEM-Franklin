@@ -60,20 +60,27 @@ function convertToRelative(href) {
     return url.pathname + url.search + url.hash;
 }
 
+// Helper function to generate a valid id from the relative URL
+function generateId(href) {
+  const url = new URL(href, window.location.origin);
+  return url.pathname.replace(/[^\w-]+/g, '_') + url.search.replace(/[^\w-]+/g, '_') + url.hash.replace(/[^\w-]+/g, '_');
+}
+
 function decorateLinks(main) {
     // Get all anchor elements within the main container
     const links = main.querySelectorAll('a');
     // Loop through each anchor element and add a target based on the business condition
     links.forEach((link) => {
-        const { href } = link;
+        const { href, title } = link;
         // Convert to relative URL if the link is within the same domain
         if (href.startsWith(window.location.origin)) {
             link.setAttribute('href', convertToRelative(href));
         }
-
-        // Add an id attribute based on the relative URL
-        const idValue = relativeHref.replace(/[^\w-]+/g, '_');
-        link.setAttribute('id', `link-${idValue}`);
+      
+        // Set the id attribute using the existing title attribute
+        if (title) {
+          link.setAttribute('id', title);
+        }
   
         // Check if it's an internal reference (has a hash fragment)
         if (link.hash) {
