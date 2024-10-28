@@ -66,24 +66,25 @@ function generateId(href) {
   return url.pathname.replace(/[^\w-]+/g, '_') + url.search.replace(/[^\w-]+/g, '_') + url.hash.replace(/[^\w-]+/g, '_');
 }
 
+
+
 function decorateLinks(main) {
   // Get all anchor elements within the main container
   const links = main.querySelectorAll('a');
-  
+
   // Helper function to convert absolute URLs to relative
   function convertToRelative(href) {
       const url = new URL(href, window.location.origin);
       return url.pathname + url.search + url.hash;
   }
 
-  // Counter to generate unique ids for each internal link
+  // Counter to generate unique ids for each internal link and backlinks
   let linkCounter = 0;
-  
+
   // Loop through each anchor element
   links.forEach((link) => {
       const { href } = link;
-      const parentParagraph = link.closest('p');
-      
+
       // Convert to relative URL if the link is within the same domain
       if (href.startsWith(window.location.origin)) {
           const relativeHref = convertToRelative(href);
@@ -96,43 +97,13 @@ function decorateLinks(main) {
           const uniqueId = `link-${linkCounter}`;
           link.setAttribute('id', uniqueId);
       }
-      
-      // If the link has a hash (indicating an internal reference), add a reverse link only if none exist
-      if (link.hash) {
-          const targetId = link.hash.substring(1); // Get the target ID without the '#' character
-          const targetElement = document.getElementById(targetId);
-
-          if (targetElement) {
-              // Check if any reverse links with href starting with "#link" already exist in the target element
-              const reverseLinkExists = Array.from(targetElement.querySelectorAll('a.reverse-link')).some(
-                  (existingLink) => existingLink.getAttribute('href').startsWith('#link')
-              );
-
-              if (!reverseLinkExists) {
-                  // Create a reverse reference link only if it doesn't exist
-                  const reverseRef = document.createElement('a');
-                  reverseRef.href = `#${link.id}`; // Use the existing or newly set id as the reverse reference
-                  reverseRef.textContent = '↩ Back to reference';
-                  reverseRef.classList.add('reverse-link'); // Add a specific class for easy identification
-                  reverseRef.style.display = 'block';
-                  reverseRef.style.fontSize = '0.9em';
-                  reverseRef.style.color = '#007bff';
-
-                  // Append the reverse reference to the target element
-                  //targetElement.appendChild(reverseRef);
-                  parentParagraph.appendChild(reverseRef);
-              }
-          }
-      }
-
-      // Additional functionality for reverse linking in the enclosing paragraph
-      
-      
-
+    
+      // Check for the existence of an enclosing paragraph
+      const parentParagraph = link.closest('p');
       if (parentParagraph) {
           const paragraphText = parentParagraph.textContent;
 
-          // Regular expression to match the first numeric prefix followed by a period, e.g., "1."
+          // Regular expression to match the first numeric prefix followed by a period, e.g., "2."
           const firstSentenceMatch = paragraphText.match(/^(\d+\.)/);
 
           if (firstSentenceMatch) {
@@ -140,21 +111,19 @@ function decorateLinks(main) {
               const existingReferenceLink = parentParagraph.querySelector(`a[href="#${link.id}"]`);
 
               if (!existingReferenceLink) {
-                  const referenceLink = document.createElement('a');
-                  referenceLink.href = `#${link.id}`;
-                  referenceLink.textContent = referenceNumber;
-                  referenceLink.style.color = '#007bff';
+                  // Create a backlink reference at the beginning of the paragraph
+                  const backlink = document.createElement('a');
+                  backlink.href = `#${link.id}`;
+                  backlink.textContent = referenceNumber;
+                  backlink.style.color = '#007bff';
 
-                  // Insert the reference link at the start of the paragraph content
-                  parentParagraph.innerHTML = `${referenceLink.outerHTML} ${paragraphText.replace(referenceNumber, '')}`;
+                  // Add the backlink reference to the start of the paragraph content
+                  parentParagraph.innerHTML = `${backlink.outerHTML} ${paragraphText.replace(referenceNumber, '')}`;
               }
           }
       }
   });
 }
-
-
-
 
 
 
