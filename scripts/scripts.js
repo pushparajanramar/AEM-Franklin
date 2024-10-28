@@ -94,7 +94,7 @@ function decorateLinks(main) {
           const hashIndex = href.indexOf('#');
           if (hashIndex !== -1) {
               const extractedId = href.substring(hashIndex + 1);
-              link.id = extractedId;  // Set the extracted part as the id
+              link.id = 'link-'+ extractedId;  // Set the extracted part as the id
           }
       }
 
