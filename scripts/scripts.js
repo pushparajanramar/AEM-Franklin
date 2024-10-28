@@ -66,42 +66,8 @@ function generateId(href) {
   return url.pathname.replace(/[^\w-]+/g, '_') + url.search.replace(/[^\w-]+/g, '_') + url.hash.replace(/[^\w-]+/g, '_');
 }
 
-
-
-function decorateLinks(main) {
-  // Get all anchor elements within the main container
-  const links = main.querySelectorAll('a');
-  
-  // Helper function to convert absolute URLs to relative
-  function convertToRelative(href) {
-      const url = new URL(href, window.location.origin);
-      return url.pathname + url.search + url.hash;
-  }
-
-  // Counter to generate unique ids for each internal link
-  let linkCounter = 0;
-  
-  // Loop through each anchor element
-  links.forEach((link) => {
-      const { href } = link;
-
-      // Convert to relative URL if the link is within the same domain
-      if (href.startsWith(window.location.origin)) {
-          const relativeHref = convertToRelative(href);
-          link.setAttribute('href', relativeHref);
-      }
-
-      // Only generate a unique id if the link does not already have one
-      if (!link.hasAttribute('id')) {
-          linkCounter++;
-          const uniqueId = `link-${linkCounter}`;
-          link.setAttribute('id', uniqueId);
-      }
-      
-      // If the link has a hash (indicating an internal reference), add a reverse link only if none exist
-      if (link.hash) {
-          const targetId = link.hash.substring(1); // Get the target ID without the '#' character
-          const targetElement = document.getElementById(targetId);
+// Get the target ID without the '#' character
+          const targetElement = document.getElementById(targetId).closest('p');;
 
           if (targetElement) {
               // Check if any reverse links with href starting with "#link" already exist in the target element
@@ -119,8 +85,8 @@ function decorateLinks(main) {
                   reverseRef.style.fontSize = '0.9em';
                   reverseRef.style.color = '#007bff';
 
-                  // Insert the reverse reference link after the target element
-                  targetElement.insertAdjacentElement('afterend', reverseRef);
+                  // Append the reverse reference to the target element
+                  targetElement.appendChild(reverseRef);
               }
           }
       }
@@ -143,14 +109,13 @@ function decorateLinks(main) {
                   referenceLink.textContent = referenceNumber;
                   referenceLink.style.color = '#007bff';
 
-                  // Insert the reference link at the start of the paragraph content, replacing the original reference number
+                  // Insert the reference link at the start of the paragraph content
                   parentParagraph.innerHTML = `${referenceLink.outerHTML} ${paragraphText.replace(referenceNumber, '')}`;
               }
           }
       }
   });
 }
-
 
 
 
