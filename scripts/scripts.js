@@ -79,7 +79,7 @@ function decorateLinks(main) {
 
   // Loop through each anchor element
   links.forEach((link) => {
-      const { href } = link;
+      const { href, id } = link;
 
       // Convert to relative URL if the link is within the same domain
       if (href.startsWith(window.location.origin)) {
@@ -88,7 +88,7 @@ function decorateLinks(main) {
       }
 
       // Ensure the link has a unique ID; if not, generate one
-      if (!link.id) {
+      if (!id) {
           link.id = `bookmark-${Math.random().toString(36).substr(2, 9)}`;
       }
 
@@ -96,7 +96,7 @@ function decorateLinks(main) {
       const parentParagraph = link.closest('p');
 
       if (parentParagraph) {
-          // Extract the reference number (e.g., "5.") from the beginning of the paragraph
+          // Extract the reference number (e.g., "2.") from the beginning of the paragraph
           const paragraphText = parentParagraph.textContent;
           const firstSentenceMatch = paragraphText.match(/^(\d+\.)/);
 
@@ -107,19 +107,20 @@ function decorateLinks(main) {
               const existingReferenceLink = parentParagraph.querySelector(`a[href="#${link.id}"]`);
 
               if (!existingReferenceLink) {
-                  // Create a new <a> tag to wrap the reference number, pointing to the first <a> ID in the paragraph
+                  // Create a new <a> tag to wrap the reference number, pointing to the bookmark's unique ID
                   const referenceLink = document.createElement('a');
                   referenceLink.href = `#${link.id}`;
                   referenceLink.textContent = referenceNumber;
                   referenceLink.style.color = '#007bff';
 
-                  // Replace the reference number text in the paragraph with the new <a> tag
-                  parentParagraph.innerHTML = parentParagraph.innerHTML.replace(referenceNumber, referenceLink.outerHTML);
+                  // Prepend the reference link to the paragraph and remove the original reference number
+                  parentParagraph.innerHTML = referenceLink.outerHTML + paragraphText.replace(referenceNumber, '');
               }
           }
       }
   });
 }
+
 
 
 
