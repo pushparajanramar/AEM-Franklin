@@ -92,7 +92,16 @@ function decorateLinks(main) {
         // Generate a unique id for each internal link
         linkCounter++;
         const uniqueId = `link-${linkCounter}`;
-        link.setAttribute('id', uniqueId);
+        const currentId = link.id;
+        if (id === null || id === "") {
+          // ID is either null or empty
+          console.log("ID is null or empty");
+          link.setAttribute('id', uniqueId);
+        } else {
+          // ID has a value
+          console.log("ID:", id);
+        }
+        
       
         // If the link has a hash (indicating an internal reference), add a reverse link
         if (link.hash) {
