@@ -70,9 +70,29 @@ function decorateLinks(main) {
         if (href.startsWith(window.location.origin)) {
             link.setAttribute('href', convertToRelative(href));
         }
+
         // Add an id attribute based on the relative URL
-        // const idValue = relativeHref.replace(/[^\w-]+/g, '_'); // Create a valid id by replacing invalid characters
-        // link.setAttribute('id', `link-${idValue}`);
+        const idValue = relativeHref.replace(/[^\w-]+/g, '_');
+        link.setAttribute('id', `link-${idValue}`);
+  
+        // Check if it's an internal reference (has a hash fragment)
+        if (link.hash) {
+          const targetId = link.hash.substring(1); // Get the target ID without the '#' character
+          const targetElement = document.getElementById(targetId);
+  
+          if (targetElement) {
+              // Create a reverse reference element
+              const reverseRef = document.createElement('a');
+              reverseRef.href = `#link-${idValue}`;
+              reverseRef.textContent = '↩ Back to reference';
+              reverseRef.style.display = 'block';
+              reverseRef.style.fontSize = '0.9em';
+              reverseRef.style.color = '#007bff';
+    
+              // Append the reverse reference to the target element
+              targetElement.appendChild(reverseRef);
+            }
+          }
 
     });
 }
