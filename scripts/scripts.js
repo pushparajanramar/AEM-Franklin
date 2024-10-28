@@ -66,6 +66,7 @@ function generateId(href) {
   return url.pathname.replace(/[^\w-]+/g, '_') + url.search.replace(/[^\w-]+/g, '_') + url.hash.replace(/[^\w-]+/g, '_');
 }
 
+
 function decorateLinks(main) {
   // Get all anchor elements within the main container
   const links = main.querySelectorAll('a');
@@ -102,7 +103,7 @@ function decorateLinks(main) {
           const targetElement = document.getElementById(targetId);
 
           if (targetElement) {
-              // Check if a reverse link with the specific href already exists in the target element
+              // Skip creating a reverse link if one already exists
               const reverseLinkSelector = `a[href="#${link.id}"]`;
               const existingReverseLink = targetElement.querySelector(reverseLinkSelector);
               
