@@ -100,16 +100,20 @@ function decorateLinks(main) {
       // Get the parent <p> tag of the current link
       const parentParagraph = link.closest('p');
 
-      // If the parent <p> exists and doesn't already contain another anchor tag
-      if (parentParagraph && parentParagraph.querySelectorAll('a').length === 1) {
+      if (parentParagraph) {
           // Split the paragraph text by a period and use the first part
-          const firstSentence = parentParagraph.textContent.split('.')[0];
+          const firstSentence = parentParagraph.textContent.split('.')[0].trim();
 
-          if (firstSentence) {
-              // Create a reverse reference link with the first sentence as the text
+          // Check if an existing anchor within <p> has the same first sentence as text
+          const existingLink = Array.from(parentParagraph.querySelectorAll('a')).find(
+              (a) => a.textContent.trim() === firstSentence
+          );
+
+          if (!existingLink && firstSentence) {
+              // Create a reverse reference link only if it doesn't exist
               const reverseRef = document.createElement('a');
               reverseRef.href = `#${uniqueId}`;
-              reverseRef.textContent = firstSentence.trim();
+              reverseRef.textContent = firstSentence;
               reverseRef.style.display = 'block';
               reverseRef.style.fontSize = '0.9em';
               reverseRef.style.color = '#007bff';
@@ -120,6 +124,7 @@ function decorateLinks(main) {
       }
   });
 }
+
 
 
 /**
