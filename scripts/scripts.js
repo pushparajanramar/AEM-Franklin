@@ -97,16 +97,21 @@ function decorateLinks(main) {
             const targetElement = document.getElementById(targetId);
 
             if (targetElement) {
-                // Create a reverse reference link
-                const reverseRef = document.createElement('a');
-                reverseRef.href = `#${link.id || title}`; // Use the link's id as the reverse reference
-                reverseRef.textContent = '↩ Back to reference';
-                reverseRef.style.display = 'block';
-                reverseRef.style.fontSize = '0.9em';
-                reverseRef.style.color = '#007bff';
+                // Check if a reverse link already exists
+                const existingReverseLink = targetElement.querySelector(`a[href="#${link.id || title}"]`);
+                
+                if (!existingReverseLink) {
+                    // Create a reverse reference link only if it doesn't exist
+                    const reverseRef = document.createElement('a');
+                    reverseRef.href = `#${link.id || title}`; // Use the link's id as the reverse reference
+                    reverseRef.textContent = '↩ Back to reference';
+                    reverseRef.style.display = 'block';
+                    reverseRef.style.fontSize = '0.9em';
+                    reverseRef.style.color = '#007bff';
 
-                // Append the reverse reference to the target element
-                targetElement.appendChild(reverseRef);
+                    // Append the reverse reference to the target element
+                    targetElement.appendChild(reverseRef);
+                }
             }
         }
     });
