@@ -90,10 +90,10 @@ function decorateLinks(main) {
       }
 
       // Generate a unique ID for each link if it doesn't already have one
-      if (!id) {
-          linkCounter++;
-          link.setAttribute('id', `link-${linkCounter}`);
-      }
+      //if (!id) {
+      //    linkCounter++;
+      //    link.setAttribute('id', `link-${linkCounter}`);
+      //}
 
       // Proceed only if the <a> tag has a <sup> child and is not an internal reference
       const supTag = link.querySelector('sup');
