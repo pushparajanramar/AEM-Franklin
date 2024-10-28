@@ -130,29 +130,7 @@ function decorateLinks(main) {
           }
       }
 
-      // Additional functionality for reverse linking in the enclosing paragraph
-      const parentParagraph = link.closest('p');
-      if (parentParagraph) {
-          const paragraphText = parentParagraph.textContent;
 
-          // Regular expression to match the first numeric prefix followed by a period, e.g., "1."
-          const firstSentenceMatch = paragraphText.match(/^(\d+\.)/);
-
-          if (firstSentenceMatch) {
-              const referenceNumber = firstSentenceMatch[0].trim();
-              const existingReferenceLink = parentParagraph.querySelector(`a[href="#${link.id}"]`);
-
-              if (!existingReferenceLink) {
-                  const referenceLink = document.createElement('a');
-                  referenceLink.href = `#${link.id}`;
-                  referenceLink.textContent = referenceNumber;
-                  referenceLink.style.color = '#007bff';
-
-                  // Insert the reference link at the start of the paragraph content
-                  parentParagraph.innerHTML = `${referenceLink.outerHTML} ${paragraphText.replace(referenceNumber, '')}`;
-              }
-          }
-      }
   });
 }
 
