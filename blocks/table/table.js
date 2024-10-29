@@ -54,7 +54,6 @@ function parseDivTable(divTable, parentTable) {
     const rows = Array.from(divTable.children);
 
     rows.forEach((rowDiv) => {
-        console.log("Reading a new row:", rowDiv);
         const currentRow = createRow();
         const cells = Array.from(rowDiv.children);
 
