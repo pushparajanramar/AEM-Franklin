@@ -2,6 +2,8 @@
 export default async function decorate(block) {
     console.log("Entering decorate function" + block);
     const table = createTableFromDivWrapper(block);
+    // Clear any existing tables within the wrapper
+    block.innerHTML = ''; // Remove all previous child elements in block
     block.appendChild(table);
 
     const wrappers = block.querySelectorAll('div'); // Select all div elements
