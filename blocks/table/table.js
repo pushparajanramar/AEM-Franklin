@@ -19,7 +19,8 @@ function parseDivTable(divTable, parentTable) {
         console.log(rowDiv);
         const currentRow = document.createElement('tr');
         const cells = Array.from(rowDiv.children);
-
+        console.log("reading all cells");
+        console.log(cells);
         cells.forEach((cellDiv) => {
             const content = cellDiv.innerHTML.trim();
             if (content === '') return; // Skip empty divs
