@@ -10,18 +10,6 @@ function parseProperties(content) {
     return properties;
 }
 
-// Main function to convert div-based tables to HTML tables with <tr>, <td>, and <th>
-function decorateTable(container, outputContainer) {
-    if (!container) {
-        console.error("Container not found:", container);
-        return;
-    }
-
-    const table = document.createElement('table');
-    parseDivTable(container, table);
-    outputContainer.appendChild(table);
-}
-
 // Function to parse div tables and create rows and cells
 function parseDivTable(divTable, parentTable) {
     const rows = Array.from(divTable.children);
@@ -54,7 +42,7 @@ function parseDivTable(divTable, parentTable) {
     });
 }
 
-
+// Main function to convert div-based tables to HTML tables with <tr>, <td>, and <th>
 export default async function decorate(block) {
     console.log("(block) is working");
     const wrapper = document.querySelector('.table-wrapper');
@@ -67,7 +55,7 @@ export default async function decorate(block) {
 
     const table = document.createElement('table');
     parseDivTable(wrapper, table);
-    outputContainer.appendChild(table);
+    wrapper.appendChild(table);
 
 
 }

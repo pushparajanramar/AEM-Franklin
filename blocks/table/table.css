@@ -74,4 +74,31 @@
   .table.bordered table td {
     border: 1px solid #dadada;
   }
-  
+    /* Style for layout */
+    .section {
+        margin: 20px 0;
+    }
+
+    /* Style to distinguish source tables */
+    .table-type-container {
+        border: 1px solid #ccc;
+        padding: 10px;
+        margin-bottom: 10px;
+    }
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    table,
+    th,
+    td {
+        border: 1px solid black;
+    }
+
+    th,
+    td {
+        padding: 8px;
+        text-align: left;
+    }
