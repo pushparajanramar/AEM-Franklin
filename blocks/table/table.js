@@ -103,7 +103,7 @@ function parseDivTable(divTable, parentTable) {
 // Main function to convert div-based tables to HTML tables with <tr>, <td>, and <th>
 export default async function decorate(block) {
     console.log("Entering decorate function");
-    const wrapper = document.querySelector('.table-wrapper');
+    const wrapper = document.querySelector('.table .block');
     console.log("reading the EDS generated content decorate function with table:", wrapper);
     // Check if the wrapper exists
     if (!wrapper) {
