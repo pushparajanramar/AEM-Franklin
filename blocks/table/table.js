@@ -1,7 +1,7 @@
 // Main function to convert div-based tables to HTML tables with <tr>, <td>, and <th>
 export default async function decorate(block) {
     console.log("Entering decorate function");
-    const wrappers = document.querySelectorAll('.table'); // Select all .table elements
+    const wrappers = block.querySelectorAll('.table'); // Select all .table elements
     console.log("Number of .table elements found:", wrappers.length);
 
     wrappers.forEach((wrapper, index) => {
