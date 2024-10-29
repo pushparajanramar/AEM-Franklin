@@ -1,3 +1,67 @@
+
+function createTableFromDivWrapper(divWrapper) {
+    const table = document.createElement('table');
+    const rows = divWrapper.querySelectorAll('.table.block > div');
+  
+    rows.forEach((rowDiv) => {
+      const tr = createTableRow(rowDiv);
+      table.appendChild(tr);
+    });
+  
+    return table;
+  }
+  
+  function createTableRow(rowDiv) {
+    const tr = document.createElement('tr');
+    const cells = rowDiv.querySelectorAll('div');
+  
+    cells.forEach((cellDiv) => {
+      const cell = createTableCell(cellDiv);
+      tr.appendChild(cell);
+    });
+  
+    return tr;
+  }
+  
+  function createTableCell(cellDiv) {
+    const isHeader = checkIfHeader(cellDiv);
+    const cell = document.createElement(isHeader ? 'th' : 'td');
+  
+    setCellAttributes(cell, cellDiv);
+    cell.innerText = cleanCellText(cellDiv.querySelector('p').textContent);
+  
+    return cell;
+  }
+  
+  function checkIfHeader(cellDiv) {
+    return cellDiv.querySelector('p').textContent.includes('$data-type=header$');
+  }
+  
+  function setCellAttributes(cell, cellDiv) {
+    const align = cellDiv.getAttribute('data-align');
+    const valign = cellDiv.getAttribute('data-valign');
+    const colspan = getColspan(cellDiv);
+  
+    if (align) cell.style.textAlign = align;
+    if (valign) cell.style.verticalAlign = valign;
+    if (colspan) cell.setAttribute('colspan', colspan);
+  }
+  
+  function getColspan(cellDiv) {
+    const colspanMatch = cellDiv.querySelector('p').textContent.match(/\$data-colspan=(\d+)\$/);
+    return colspanMatch ? colspanMatch[1] : null;
+  }
+  
+  function cleanCellText(text) {
+    return text
+      .replace(/\$data-type=header\$/, '')
+      .replace(/\$data-end=row\$/, '')
+      .replace(/\$data-colspan=\d+\$/, '')
+      .trim();
+  }
+  
+  
+  
 // Helper function to extract properties from content enclosed in $...$
 function parseProperties(content) {
     console.log("Entering parseProperties with content:", content);
@@ -109,13 +173,17 @@ export default async function decorate(block) {
         console.log(`Processing .table wrapper ${index + 1}:`, wrapper);
         
         // Clear any existing tables within the wrapper
-        wrapper.innerHTML = ''; // Remove all previous child elements in wrapper
+        //wrapper.innerHTML = ''; // Remove all previous child elements in wrapper
 
         // Create a new table element
-        const table = document.createElement('table');
+        //const table = document.createElement('table');
 
         // Parse div-based structure and populate the newly created table
-        parseDivTable(wrapper, table);
+        //parseDivTable(wrapper, table);
+
+        // Usage example
+      
+        const table = createTableFromDivWrapper(wrapper);
 
         // Append the single parsed table to the wrapper
         wrapper.appendChild(table);
