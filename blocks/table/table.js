@@ -1,6 +1,6 @@
 // Helper function to extract properties from content enclosed in $...$
 function parseProperties(content) {
-    console.log("Entering parseProperties");
+    console.log("Entering parseProperties with content:", content);
     const properties = {};
     const regex = /\$(.*?)\$/g;
     let match;
@@ -24,15 +24,11 @@ function createRow() {
 function createHeaderCell(cellDiv, properties) {
     console.log("Entering createHeaderCell with cellDiv:", cellDiv, "and properties:", properties);
     const th = document.createElement('th');
-
-    // Create a <div> inside <th> to maintain structure
     const innerDiv = document.createElement('div');
-    innerDiv.innerHTML = cellDiv.innerHTML; // Copy the innerHTML from the source div
-    copyAttributes(cellDiv, innerDiv); // Copy attributes from the original div
-
+    innerDiv.innerHTML = cellDiv.innerHTML.replace(/\$.*?\$/g, '').trim(); // Remove $...$ tags
+    copyAttributes(cellDiv, innerDiv);
     th.appendChild(innerDiv);
 
-    // Apply colspan and rowspan if specified
     if (properties['data-colspan']) th.colSpan = properties['data-colspan'];
     if (properties['data-rowspan']) th.rowSpan = properties['data-rowspan'];
 
@@ -44,15 +40,11 @@ function createHeaderCell(cellDiv, properties) {
 function createDataCell(cellDiv, properties) {
     console.log("Entering createDataCell with cellDiv:", cellDiv, "and properties:", properties);
     const td = document.createElement('td');
-
-    // Create a <div> inside <td> to maintain structure
     const innerDiv = document.createElement('div');
-    innerDiv.innerHTML = cellDiv.innerHTML; // Copy the innerHTML from the source div
-    copyAttributes(cellDiv, innerDiv); // Copy attributes from the original div
-
+    innerDiv.innerHTML = cellDiv.innerHTML.replace(/\$.*?\$/g, '').trim();
+    copyAttributes(cellDiv, innerDiv);
     td.appendChild(innerDiv);
 
-    // Apply colspan and rowspan if specified
     if (properties['data-colspan']) td.colSpan = properties['data-colspan'];
     if (properties['data-rowspan']) td.rowSpan = properties['data-rowspan'];
 
@@ -62,9 +54,11 @@ function createDataCell(cellDiv, properties) {
 
 // Function to copy attributes from one element to another
 function copyAttributes(source, target) {
+    console.log("Entering copyAttributes with source:", source, "and target:", target);
     Array.from(source.attributes).forEach(attr => {
         target.setAttribute(attr.name, attr.value);
     });
+    console.log("Exiting copyAttributes with target:", target);
 }
 
 // Function to parse div tables and create rows and cells
@@ -82,18 +76,13 @@ function parseDivTable(divTable, parentTable) {
 
             console.log("Reading a new cell:", cellDiv);
             const properties = parseProperties(content);
-            const cellContent = content.replace(/\$.*?\$/g, '').trim(); // Remove $...$ tags from content
-
-            // Create a cell (either <th> for headers or <td> for regular cells) with an inner <div>
             const cell = properties['data-type'] === 'header' 
                 ? createHeaderCell(cellDiv, properties) 
                 : createDataCell(cellDiv, properties);
 
-            // Append the cell to the current row
             currentRow.appendChild(cell);
         });
 
-        // Append the row to the table
         parentTable.appendChild(currentRow);
     });
 
@@ -109,7 +98,7 @@ export default async function decorate(block) {
     // Check if the wrapper exists
     if (!wrapper) {
         console.error('Wrapper element not found!');
-        return; // Exit the function if wrapper is not found
+        return;
     }
 
     // Clear any existing tables within the wrapper
