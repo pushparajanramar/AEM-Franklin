@@ -104,15 +104,24 @@ function parseDivTable(divTable, parentTable) {
 export default async function decorate(block) {
     console.log("Entering decorate function");
     const wrapper = document.querySelector('.table');
-    console.log("reading the EDS generated content decorate function with table:", wrapper);
+    console.log("Reading the EDS generated content in decorate function with table:", wrapper);
+
     // Check if the wrapper exists
     if (!wrapper) {
         console.error('Wrapper element not found!');
         return; // Exit the function if wrapper is not found
     }
 
+    // Clear any existing tables within the wrapper
+    wrapper.innerHTML = ''; // Remove all previous child elements in wrapper
+
+    // Create a new table element
     const table = document.createElement('table');
+    
+    // Parse div-based structure and populate the newly created table
     parseDivTable(wrapper, table);
+
+    // Append the single parsed table to the wrapper
     wrapper.appendChild(table);
 
     console.log("Exiting decorate function with table:", table);
