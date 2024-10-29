@@ -54,7 +54,7 @@ export default async function decorate(block) {
     }
 
     const table = document.createElement('table');
-    parseDivTable(wrapper, table);
+    //parseDivTable(wrapper, table);
     wrapper.appendChild(table);
 
 
