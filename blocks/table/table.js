@@ -10,34 +10,54 @@ function parseProperties(content) {
     return properties;
 }
 
+// Function to create a new <tr> element
+function createRow() {
+    return document.createElement('tr');
+}
+
+// Function to create a new <th> element with content and properties
+function createHeaderCell(content, properties) {
+    const th = document.createElement('th');
+    th.innerHTML = content; // Set innerHTML to retain any HTML content
+
+    // Apply colspan and rowspan if specified
+    if (properties['data-colspan']) th.colSpan = properties['data-colspan'];
+    if (properties['data-rowspan']) th.rowSpan = properties['data-rowspan'];
+
+    return th;
+}
+
+// Function to create a new <td> element with content and properties
+function createDataCell(content, properties) {
+    const td = document.createElement('td');
+    td.innerHTML = content; // Set innerHTML to retain any HTML content
+
+    // Apply colspan and rowspan if specified
+    if (properties['data-colspan']) td.colSpan = properties['data-colspan'];
+    if (properties['data-rowspan']) td.rowSpan = properties['data-rowspan'];
+
+    return td;
+}
+
 // Function to parse div tables and create rows and cells
 function parseDivTable(divTable, parentTable) {
     const rows = Array.from(divTable.children);
-    console.log(rows);
+
     rows.forEach((rowDiv) => {
-        console.log("reading one row");
-        console.log(rowDiv);
-        const currentRow = document.createElement('tr');
+        const currentRow = createRow();
         const cells = Array.from(rowDiv.children);
-        console.log("reading all cells");
-        console.log(cells);
+
         cells.forEach((cellDiv) => {
             const content = cellDiv.innerHTML.trim();
             if (content === '') return; // Skip empty divs
-            console.log("reading one cell");
-            console.log(content);
+
             const properties = parseProperties(content);
-            console.log("reading properties");
-            console.log(properties);
             const cellContent = content.replace(/\$.*?\$/g, '').trim(); // Remove $...$ tags from content
 
             // Create a cell (either <th> for headers or <td> for regular cells)
-            const cell = properties['data-type'] === 'header' ? document.createElement('th') : document.createElement('td');
-            cell.innerHTML = cellContent; // Set innerHTML to retain any HTML content
-
-            // Apply colspan and rowspan if specified
-            if (properties['data-colspan']) cell.colSpan = properties['data-colspan'];
-            if (properties['data-rowspan']) cell.rowSpan = properties['data-rowspan'];
+            const cell = properties['data-type'] === 'header' 
+                ? createHeaderCell(cellContent, properties) 
+                : createDataCell(cellContent, properties);
 
             // Append the cell to the current row
             currentRow.appendChild(cell);
@@ -50,7 +70,6 @@ function parseDivTable(divTable, parentTable) {
 
 // Main function to convert div-based tables to HTML tables with <tr>, <td>, and <th>
 export default async function decorate(block) {
-    console.log("(block) is working");
     const wrapper = document.querySelector('.table-wrapper');
 
     // Check if the wrapper exists
@@ -62,6 +81,4 @@ export default async function decorate(block) {
     const table = document.createElement('table');
     parseDivTable(wrapper, table);
     wrapper.appendChild(table);
-
-
 }
