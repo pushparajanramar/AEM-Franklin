@@ -5,7 +5,7 @@ export default async function decorate(block) {
 
     console.log("Number of div elements found:", wrappers.length);
 
-    //wrappers.forEach((wrapper, index) => {
+    wrappers.forEach((wrapper, index) => {
         //console.log(`Processing .table wrapper ${index + 1}:`, wrapper);
         
        // const table = createTableFromDivWrapper(wrapper);
