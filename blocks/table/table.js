@@ -13,16 +13,21 @@ function parseProperties(content) {
 // Function to parse div tables and create rows and cells
 function parseDivTable(divTable, parentTable) {
     const rows = Array.from(divTable.children);
-
+    console.log(rows);
     rows.forEach((rowDiv) => {
+        console.log("reading one row");
+        console.log(rowDiv);
         const currentRow = document.createElement('tr');
         const cells = Array.from(rowDiv.children);
 
         cells.forEach((cellDiv) => {
             const content = cellDiv.innerHTML.trim();
             if (content === '') return; // Skip empty divs
-
+            console.log("reading one cell");
+            console.log(content);
             const properties = parseProperties(content);
+            console.log("reading properties");
+            console.log(properties);
             const cellContent = content.replace(/\$.*?\$/g, '').trim(); // Remove $...$ tags from content
 
             // Create a cell (either <th> for headers or <td> for regular cells)
@@ -54,7 +59,7 @@ export default async function decorate(block) {
     }
 
     const table = document.createElement('table');
-    //parseDivTable(wrapper, table);
+    parseDivTable(wrapper, table);
     wrapper.appendChild(table);
 
 
