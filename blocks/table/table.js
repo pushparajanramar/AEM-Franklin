@@ -21,10 +21,16 @@ function createRow() {
 }
 
 // Function to create a new <th> element with content and properties
-function createHeaderCell(content, properties) {
-    console.log("Entering createHeaderCell with content:", content, "and properties:", properties);
+function createHeaderCell(cellDiv, properties) {
+    console.log("Entering createHeaderCell with cellDiv:", cellDiv, "and properties:", properties);
     const th = document.createElement('th');
-    th.innerHTML = content; // Set innerHTML to retain any HTML content
+
+    // Create a <div> inside <th> to maintain structure
+    const innerDiv = document.createElement('div');
+    innerDiv.innerHTML = cellDiv.innerHTML; // Copy the innerHTML from the source div
+    copyAttributes(cellDiv, innerDiv); // Copy attributes from the original div
+
+    th.appendChild(innerDiv);
 
     // Apply colspan and rowspan if specified
     if (properties['data-colspan']) th.colSpan = properties['data-colspan'];
@@ -35,10 +41,16 @@ function createHeaderCell(content, properties) {
 }
 
 // Function to create a new <td> element with content and properties
-function createDataCell(content, properties) {
-    console.log("Entering createDataCell with content:", content, "and properties:", properties);
+function createDataCell(cellDiv, properties) {
+    console.log("Entering createDataCell with cellDiv:", cellDiv, "and properties:", properties);
     const td = document.createElement('td');
-    td.innerHTML = content; // Set innerHTML to retain any HTML content
+
+    // Create a <div> inside <td> to maintain structure
+    const innerDiv = document.createElement('div');
+    innerDiv.innerHTML = cellDiv.innerHTML; // Copy the innerHTML from the source div
+    copyAttributes(cellDiv, innerDiv); // Copy attributes from the original div
+
+    td.appendChild(innerDiv);
 
     // Apply colspan and rowspan if specified
     if (properties['data-colspan']) td.colSpan = properties['data-colspan'];
@@ -46,6 +58,13 @@ function createDataCell(content, properties) {
 
     console.log("Exiting createDataCell with td:", td);
     return td;
+}
+
+// Function to copy attributes from one element to another
+function copyAttributes(source, target) {
+    Array.from(source.attributes).forEach(attr => {
+        target.setAttribute(attr.name, attr.value);
+    });
 }
 
 // Function to parse div tables and create rows and cells
@@ -65,10 +84,10 @@ function parseDivTable(divTable, parentTable) {
             const properties = parseProperties(content);
             const cellContent = content.replace(/\$.*?\$/g, '').trim(); // Remove $...$ tags from content
 
-            // Create a cell (either <th> for headers or <td> for regular cells)
+            // Create a cell (either <th> for headers or <td> for regular cells) with an inner <div>
             const cell = properties['data-type'] === 'header' 
-                ? createHeaderCell(cellContent, properties) 
-                : createDataCell(cellContent, properties);
+                ? createHeaderCell(cellDiv, properties) 
+                : createDataCell(cellDiv, properties);
 
             // Append the cell to the current row
             currentRow.appendChild(cell);
