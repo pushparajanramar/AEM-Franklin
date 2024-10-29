@@ -41,7 +41,7 @@ function createDataCell(cellDiv, properties) {
     console.log("Entering createDataCell with cellDiv:", cellDiv, "and properties:", properties);
     const td = document.createElement('td');
     const innerDiv = document.createElement('div');
-    innerDiv.innerHTML = cellDiv.innerHTML.replace(/\$.*?\$/g, '').trim();
+    innerDiv.innerHTML = cellDiv.innerHTML.replace(/\$.*?\$/g, '').trim(); // Remove $...$ tags
     copyAttributes(cellDiv, innerDiv);
     td.appendChild(innerDiv);
 
@@ -81,9 +81,17 @@ function parseDivTable(divTable, parentTable) {
                 : createDataCell(cellDiv, properties);
 
             currentRow.appendChild(cell);
+
+            // End the row if data-end=row is found
+            if (properties['data-end'] === 'row') {
+                parentTable.appendChild(currentRow);
+            }
         });
 
-        parentTable.appendChild(currentRow);
+        // Append the row if it hasn't been appended yet
+        if (!parentTable.contains(currentRow)) {
+            parentTable.appendChild(currentRow);
+        }
     });
 
     console.log("Exiting parseDivTable with parentTable:", parentTable);
@@ -92,26 +100,26 @@ function parseDivTable(divTable, parentTable) {
 // Main function to convert div-based tables to HTML tables with <tr>, <td>, and <th>
 export default async function decorate(block) {
     console.log("Entering decorate function");
-    const wrapper = document.querySelector('.table');
-    console.log("Reading the EDS generated content in decorate function with table:", wrapper);
+    const wrappers = document.querySelectorAll('.table'); // Select all .table elements
+    console.log("Number of .table elements found:", wrappers.length);
 
-    // Check if the wrapper exists
-    if (!wrapper) {
-        console.error('Wrapper element not found!');
-        return;
-    }
+    wrappers.forEach((wrapper) => {
+        console.log("Processing a new .table wrapper:", wrapper);
+        
+        // Clear any existing tables within the wrapper
+        wrapper.innerHTML = ''; // Remove all previous child elements in wrapper
 
-    // Clear any existing tables within the wrapper
-    wrapper.innerHTML = ''; // Remove all previous child elements in wrapper
+        // Create a new table element
+        const table = document.createElement('table');
 
-    // Create a new table element
-    const table = document.createElement('table');
-    
-    // Parse div-based structure and populate the newly created table
-    parseDivTable(wrapper, table);
+        // Parse div-based structure and populate the newly created table
+        parseDivTable(wrapper, table);
 
-    // Append the single parsed table to the wrapper
-    wrapper.appendChild(table);
+        // Append the single parsed table to the wrapper
+        wrapper.appendChild(table);
 
-    console.log("Exiting decorate function with table:", table);
+        console.log("Appended table to wrapper:", wrapper);
+    });
+
+    console.log("Exiting decorate function");
 }
