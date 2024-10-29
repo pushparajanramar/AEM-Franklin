@@ -104,7 +104,7 @@ function parseDivTable(divTable, parentTable) {
 export default async function decorate(block) {
     console.log("Entering decorate function");
     const wrapper = document.querySelector('.table-wrapper');
-
+    console.log("reading the EDS generated content decorate function with table:", wrapper);
     // Check if the wrapper exists
     if (!wrapper) {
         console.error('Wrapper element not found!');
