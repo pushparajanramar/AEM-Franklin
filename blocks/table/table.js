@@ -107,16 +107,16 @@ export default async function decorate(block) {
         console.log("Processing a new .table wrapper:", wrapper);
         
         // Clear any existing tables within the wrapper
-        wrapper.innerHTML = ''; // Remove all previous child elements in wrapper
+        //wrapper.innerHTML = ''; // Remove all previous child elements in wrapper
 
         // Create a new table element
-        const table = document.createElement('table');
+        //const table = document.createElement('table');
 
         // Parse div-based structure and populate the newly created table
-        parseDivTable(wrapper, table);
+        //parseDivTable(wrapper, table);
 
         // Append the single parsed table to the wrapper
-        wrapper.appendChild(table);
+        // wrapper.appendChild(table);
 
         console.log("Appended table to wrapper:", wrapper);
     });
