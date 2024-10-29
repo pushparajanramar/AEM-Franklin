@@ -66,15 +66,15 @@ function parseDivTable(divTable, parentTable) {
     console.log("Entering parseDivTable with divTable:", divTable);
     const rows = Array.from(divTable.children);
 
-    rows.forEach((rowDiv) => {
+    rows.forEach((rowDiv, rowIndex) => {
         const currentRow = createRow();
         const cells = Array.from(rowDiv.children);
 
-        cells.forEach((cellDiv) => {
+        cells.forEach((cellDiv, cellIndex) => {
             const content = cellDiv.innerHTML.trim();
             if (content === '') return; // Skip empty divs
 
-            console.log("Reading a new cell:", cellDiv);
+            console.log(`Reading cell at row ${rowIndex + 1}, column ${cellIndex + 1}:`, cellDiv);
             const properties = parseProperties(content);
             const cell = properties['data-type'] === 'header' 
                 ? createHeaderCell(cellDiv, properties) 
@@ -82,14 +82,16 @@ function parseDivTable(divTable, parentTable) {
 
             currentRow.appendChild(cell);
 
-            // End the row if data-end=row is found
+            // Append the row immediately if data-end=row is found
             if (properties['data-end'] === 'row') {
+                console.log("Appending row to table due to data-end=row");
                 parentTable.appendChild(currentRow);
             }
         });
 
-        // Append the row if it hasn't been appended yet
+        // Append row to the table if it hasn't been appended yet
         if (!parentTable.contains(currentRow)) {
+            console.log("Appending row to table");
             parentTable.appendChild(currentRow);
         }
     });
@@ -103,20 +105,20 @@ export default async function decorate(block) {
     const wrappers = document.querySelectorAll('.table'); // Select all .table elements
     console.log("Number of .table elements found:", wrappers.length);
 
-    wrappers.forEach((wrapper) => {
-        console.log("Processing a new .table wrapper:", wrapper);
+    wrappers.forEach((wrapper, index) => {
+        console.log(`Processing .table wrapper ${index + 1}:`, wrapper);
         
         // Clear any existing tables within the wrapper
-        //wrapper.innerHTML = ''; // Remove all previous child elements in wrapper
+        wrapper.innerHTML = ''; // Remove all previous child elements in wrapper
 
         // Create a new table element
-        //const table = document.createElement('table');
+        const table = document.createElement('table');
 
         // Parse div-based structure and populate the newly created table
-        //parseDivTable(wrapper, table);
+        parseDivTable(wrapper, table);
 
         // Append the single parsed table to the wrapper
-        // wrapper.appendChild(table);
+        wrapper.appendChild(table);
 
         console.log("Appended table to wrapper:", wrapper);
     });
