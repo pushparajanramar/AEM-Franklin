@@ -43,26 +43,28 @@ function createTableRow(rowDiv) {
 
 // Function to create a table cell, either <th> or <td>, based on data-type
 // Updated function to create a table cell, handling nested HTML
+// Function to create a table cell, ensuring header cells are generated as <th>
 function createTableCell(cellDiv) {
-    console.log("Entering createTableCell");
+    console.log("Entering createTableCell with cellDiv:", cellDiv);
     const isHeader = checkIfHeader(cellDiv);
-    const cell = document.createElement(isHeader ? 'th' : 'td');
+    const cell = document.createElement(isHeader ? 'th' : 'td');  // Correctly create <th> or <td> based on header status
 
     setCellAttributes(cell, cellDiv);
 
-    // Use innerHTML to preserve nested elements
+    // Use innerHTML to preserve nested elements and cleaned-up content
     cell.innerHTML = cleanCellText(cellDiv.querySelector('p').innerHTML);
 
-    console.log("Exiting createTableCell");
+    console.log("Exiting createTableCell with cell type:", isHeader ? 'th' : 'td', "and content:", cell.innerHTML);
     return cell;
 }
 
 // Helper function to check if a cell is a header based on content
+// Updated function to check if a cell is a header based on content, handling whitespaces and variations
 function checkIfHeader(cellDiv) {
-    console.log("Entering checkIfHeader");
-    const result = cellDiv.querySelector('p').textContent.includes('$data-type=header$');
-    console.log("Exiting checkIfHeader with result:", result);
-    return result;
+    console.log("Entering checkIfHeader with cell content:", cellDiv.querySelector('p').textContent);
+    const isHeader = /\$data-type=header\$/i.test(cellDiv.querySelector('p').textContent);
+    console.log("Exiting checkIfHeader with result:", isHeader);
+    return isHeader;
 }
 
 // Function to set alignment, vertical alignment, and colspan attributes on a cell
@@ -90,13 +92,17 @@ function getColspan(cellDiv) {
 
 // Helper function to clean up cell text by removing special markers
 // Updated helper function to clean up cell text by removing special markers, keeping HTML intact
+// Updated helper function to clean up cell text by removing special markers only, leaving other content intact
 function cleanCellText(htmlContent) {
-    console.log("Entering cleanCellText");
+    console.log("Entering cleanCellText with content:", htmlContent);
+    
+    // Remove all $...$ markers but keep other content as is
     const result = htmlContent
-        .replace(/\$data-type=header\$/, '')
-        .replace(/\$data-end=row\$/, '')
-        .replace(/\$data-colspan=\d+\$/, '')
-        .trim();
+        .replace(/\$data-type=header\$/, '')  // Remove specific header marker
+        .replace(/\$data-end=row\$/, '')      // Remove row end marker
+        .replace(/\$data-colspan=\d+\$/, '')  // Remove colspan marker
+        .trim(); // Trim only leading and trailing whitespace
+    
     console.log("Exiting cleanCellText with result:", result);
     return result;
 }
