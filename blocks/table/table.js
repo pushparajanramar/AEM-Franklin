@@ -44,15 +44,16 @@ function createTableRow(rowDiv) {
 // Function to create a table cell, either <th> or <td>, based on data-type
 // Updated function to create a table cell, handling nested HTML
 // Function to create a table cell, ensuring header cells are generated as <th>
+// Function to create a table cell, ensuring header cells are generated as <th>
 function createTableCell(cellDiv) {
     console.log("Entering createTableCell with cellDiv:", cellDiv);
     const isHeader = checkIfHeader(cellDiv);
-    const cell = document.createElement(isHeader ? 'th' : 'td');  // Correctly create <th> or <td> based on header status
+    const cell = document.createElement(isHeader ? 'th' : 'td');  // Create <th> or <td> based on header status
 
     setCellAttributes(cell, cellDiv);
 
     // Use innerHTML to preserve nested elements and cleaned-up content
-    cell.innerHTML = cleanCellText(cellDiv.querySelector('p').innerHTML);
+    cell.innerHTML = cleanCellText(cellDiv.innerHTML);
 
     console.log("Exiting createTableCell with cell type:", isHeader ? 'th' : 'td', "and content:", cell.innerHTML);
     return cell;
@@ -60,9 +61,19 @@ function createTableCell(cellDiv) {
 
 // Helper function to check if a cell is a header based on content
 // Updated function to check if a cell is a header based on content, handling whitespaces and variations
+// Function to check if any <p> tag in a cell contains the header marker
 function checkIfHeader(cellDiv) {
-    console.log("Entering checkIfHeader with cell content:", cellDiv.querySelector('p').textContent);
-    const isHeader = /\$data-type=header\$/i.test(cellDiv.querySelector('p').textContent);
+    console.log("Entering checkIfHeader with cellDiv:", cellDiv);
+    const paragraphs = cellDiv.querySelectorAll('p');
+    let isHeader = false;
+
+    // Loop through all <p> tags to check for the header marker
+    paragraphs.forEach((p) => {
+        if (/\$data-type=header\$/i.test(p.innerHTML)) {
+            isHeader = true;
+        }
+    });
+
     console.log("Exiting checkIfHeader with result:", isHeader);
     return isHeader;
 }
@@ -93,16 +104,17 @@ function getColspan(cellDiv) {
 // Helper function to clean up cell text by removing special markers
 // Updated helper function to clean up cell text by removing special markers, keeping HTML intact
 // Updated helper function to clean up cell text by removing special markers only, leaving other content intact
+// Updated helper function to clean up cell text by removing special markers, leaving other content intact
 function cleanCellText(htmlContent) {
     console.log("Entering cleanCellText with content:", htmlContent);
-    
-    // Remove all $...$ markers but keep other content as is
+
+    // Remove $...$ markers only, keeping all other HTML content intact
     const result = htmlContent
-        .replace(/\$data-type=header\$/, '')  // Remove specific header marker
-        .replace(/\$data-end=row\$/, '')      // Remove row end marker
-        .replace(/\$data-colspan=\d+\$/, '')  // Remove colspan marker
-        .trim(); // Trim only leading and trailing whitespace
-    
+        .replace(/\$data-type=header\$/g, '')  // Remove header marker
+        .replace(/\$data-end=row\$/g, '')      // Remove row end marker
+        .replace(/\$data-colspan=\d+\$/g, '')  // Remove colspan marker
+        .trim();
+
     console.log("Exiting cleanCellText with result:", result);
     return result;
 }
