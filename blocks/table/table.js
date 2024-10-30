@@ -42,13 +42,16 @@ function createTableRow(rowDiv) {
 }
 
 // Function to create a table cell, either <th> or <td>, based on data-type
+// Updated function to create a table cell, handling nested HTML
 function createTableCell(cellDiv) {
     console.log("Entering createTableCell");
     const isHeader = checkIfHeader(cellDiv);
     const cell = document.createElement(isHeader ? 'th' : 'td');
 
     setCellAttributes(cell, cellDiv);
-    cell.innerText = cleanCellText(cellDiv.querySelector('p').textContent);
+
+    // Use innerHTML to preserve nested elements
+    cell.innerHTML = cleanCellText(cellDiv.querySelector('p').innerHTML);
 
     console.log("Exiting createTableCell");
     return cell;
@@ -86,9 +89,10 @@ function getColspan(cellDiv) {
 }
 
 // Helper function to clean up cell text by removing special markers
-function cleanCellText(text) {
+// Updated helper function to clean up cell text by removing special markers, keeping HTML intact
+function cleanCellText(htmlContent) {
     console.log("Entering cleanCellText");
-    const result = text
+    const result = htmlContent
         .replace(/\$data-type=header\$/, '')
         .replace(/\$data-end=row\$/, '')
         .replace(/\$data-colspan=\d+\$/, '')
