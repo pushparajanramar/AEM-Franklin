@@ -90,17 +90,13 @@ function getColspan(cellDiv) {
 
 // Helper function to clean up cell text by removing special markers
 // Updated helper function to clean up cell text by removing special markers, keeping HTML intact
-// Updated helper function to clean up cell text by removing special markers only, leaving other content intact
 function cleanCellText(htmlContent) {
-    console.log("Entering cleanCellText with content:", htmlContent);
-    
-    // Remove all $...$ markers but keep other content as is
+    console.log("Entering cleanCellText");
     const result = htmlContent
-        .replace(/\$data-type=header\$/, '')  // Remove specific header marker
-        .replace(/\$data-end=row\$/, '')      // Remove row end marker
-        .replace(/\$data-colspan=\d+\$/, '')  // Remove colspan marker
-        .trim(); // Trim only leading and trailing whitespace
-    
+        .replace(/\$data-type=header\$/, '')
+        .replace(/\$data-end=row\$/, '')
+        .replace(/\$data-colspan=\d+\$/, '')
+        .trim();
     console.log("Exiting cleanCellText with result:", result);
     return result;
 }
