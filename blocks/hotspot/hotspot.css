@@ -1,0 +1,74 @@
+/* CSS: styles.css */
+.block.hotspot {
+    position: relative;
+    background: none;
+}
+
+.block.hotspot img {
+    max-width: 100%;
+    width: auto;
+    height: auto;
+}
+
+.block.hotspot > div.hotspot {
+    background: red; /* Temporary for visibility */
+    z-index: 10; /* Ensure it is above the image */
+    width: 20px;
+    height: 20px;
+    border-radius: 100%;
+    border: 3px solid white;
+    position: absolute;
+    cursor: pointer;
+}
+
+.block.hotspot img,
+.block.hotspot video {
+    max-width: 100%;
+    width: auto;
+    height: auto;
+}
+
+.block.hotspot > div.hotspot .hotspot-content {
+    display: none; /* Hidden by default */
+    position: absolute;
+    top: -10px; /* Adjust positioning as needed */
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px;
+    border-radius: 5px;
+    z-index: 15;
+    width: 200px; /* Adjust size as needed */
+}
+
+.block.hotspot > div.hotspot .hotspot-content.bgborder {
+    background: white;
+    border: 1px solid white;
+}
+
+.block.hotspot > div.hotspot.onclick .hotspot-content,
+.block.hotspot > div.hotspot:hover .hotspot-content {
+    display: block; /* Show on click or hover */
+}
+
+.block.hotspot > div.hotspot .hotspot-content img,
+.block.hotspot > div.hotspot .hotspot-content video {
+    width: 400px;
+    height: auto;
+    max-width: unset;
+}
+
+.block.hotspot > div.hotspot .hotspot-content video {
+    max-height: 150px; /* Adjust as needed */
+}
+
+.block.hotspot > div.hotspot:hover::after,
+.block.hotspot > div.hotspot.onclick::after {
+    opacity: 1;
+}
+
+.block.hotspot svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
+}
