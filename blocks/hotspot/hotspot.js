@@ -8,7 +8,7 @@ export default function decorate(block) {
         const isTextVariant = !isImageVariant && !isVideoVariant;
   
         const nexticondiv = document.createElement('div');
-        nexticondiv.classList.add('hotspot'); // Added class for CSS targeting
+        nexticondiv.classList.add('hotspot');
         nexticondiv.style.left = [...row.children][1].textContent;
         nexticondiv.style.top = [...row.children][2].textContent;
         nexticondiv.setAttribute('data', content);
@@ -18,15 +18,16 @@ export default function decorate(block) {
         contentContainer.classList.add('hotspot-content');
   
         if (isImageVariant) {
-          const img = document.createElement('img');
-          img.src = content;
-          contentContainer.appendChild(img);
+          const link = document.createElement('a');
+          link.href = content;
+          link.textContent = 'click here';
+          link.target = '_blank'; // Open link in a new tab
+          contentContainer.appendChild(link);
         } else if (isVideoVariant) {
           const video = document.createElement('div');
           const allowedVideoDomains = ['youtube.com', 'vimeo.com', 'sidekick-library--aem-block-collection--adobe'];
           try {
             const url = new URL(content);
-            // the below code can be updated to include more video hosting sites
             const domainCheck = (domain) => url.hostname.includes(domain);
             const isTrustedDomain = allowedVideoDomains.some(domainCheck);
             if (isTrustedDomain) {
@@ -48,23 +49,20 @@ export default function decorate(block) {
             video.textContent = 'Invalid video URL.';
             contentContainer.classList.add('bgborder');
           }
-          // above code can be updated for video controls such as autoplay, loop, etc.
           contentContainer.appendChild(video);
         } else if (isTextVariant) {
-          contentContainer.textContent = content; // Display text
+          contentContainer.textContent = content;
           contentContainer.classList.add('bgborder');
         }
   
         // Append content container to hotspot div
         nexticondiv.appendChild(contentContainer);
         nexticondiv.addEventListener('click', () => {
-        // Hide content of all other hotspots
           document.querySelectorAll('.hotspot').forEach((hotspot) => {
             if (hotspot !== nexticondiv) {
               hotspot.classList.remove('onclick');
             }
           });
-          // Toggle the current hotspot content
           nexticondiv.classList.toggle('onclick');
         });
   
@@ -73,3 +71,4 @@ export default function decorate(block) {
       }
     });
   }
+  
