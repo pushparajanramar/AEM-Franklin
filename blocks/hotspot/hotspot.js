@@ -19,9 +19,9 @@ export default function decorate(block) {
   
         if (isImageVariant) {
           const link = document.createElement('a');
-          link.href = content;
-          link.textContent = 'click here';
-          link.target = '_blank'; // Open link in a new tab
+          link.href = `#${content.replace(/\s+/g, '')}`; // Generate the anchor link based on the content, removing spaces
+          link.textContent = content; // Set the text to "Inhibitory Activity" or similar
+          link.target = '_self'; // Open link in the same tab
           contentContainer.appendChild(link);
         } else if (isVideoVariant) {
           const video = document.createElement('div');
