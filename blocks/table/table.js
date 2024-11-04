@@ -2,10 +2,8 @@
 export default async function decorate(block) {
     console.log("Entering decorate function" + block);
     const table = createTableFromDivWrapper(block);
-    // Clear any existing tables within the wrapper
-    block.innerHTML = ''; // Remove all previous child elements in block  
+    block.innerHTML = ''; // Clear all previous child elements in block
     block.appendChild(table);
-
     console.log("Exiting decorate function");
 }
 
@@ -14,10 +12,18 @@ function createTableFromDivWrapper(divWrapper) {
     console.log("Entering createTableFromDivWrapper");
     const table = document.createElement('table');
     const rows = divWrapper.querySelectorAll('.table.block > div');
+    const maxColumns = calculateMaxColumns(rows);
+    let isHeaderSection = true;
 
-    rows.forEach((rowDiv, index) => {
-        const isFirstRow = index === 0;
-        const tr = createTableRow(rowDiv, isFirstRow);
+    rows.forEach((rowDiv) => {
+        const cellTexts = Array.from(rowDiv.querySelectorAll('div')).map(cell => cell.innerText.trim());
+        
+        if (cellTexts.includes("***")) {
+            isHeaderSection = false; // Stop treating rows as headers after the "***" marker row
+            return; // Skip the "***" row from rendering
+        }
+
+        const tr = createTableRow(rowDiv, isHeaderSection, maxColumns);
         table.appendChild(tr);
     });
 
@@ -26,13 +32,13 @@ function createTableFromDivWrapper(divWrapper) {
 }
 
 // Function to create a new <tr> element for each row div
-function createTableRow(rowDiv, isFirstRow) {
+function createTableRow(rowDiv, isHeaderSection, maxColumns) {
     console.log("Entering createTableRow");
     const tr = document.createElement('tr');
     const cells = rowDiv.querySelectorAll('div');
 
     cells.forEach((cellDiv) => {
-        const cell = createTableCell(cellDiv, isFirstRow);
+        const cell = createTableCell(cellDiv, isHeaderSection, maxColumns);
         tr.appendChild(cell);
     });
 
@@ -40,35 +46,22 @@ function createTableRow(rowDiv, isFirstRow) {
     return tr;
 }
 
-// Function to create a table cell, ensuring header cells are generated as <th> in the first row
-function createTableCell(cellDiv, isFirstRow) {
+// Function to create a table cell, ensuring header cells are generated as <th> when in header section
+function createTableCell(cellDiv, isHeaderSection, maxColumns) {
     console.log("Entering createTableCell with cellDiv:", cellDiv);
-    const isHeader = isFirstRow || checkIfHeader(cellDiv); // Treat all cells in the first row as headers
-    const cell = document.createElement(isHeader ? 'th' : 'td');  // Create <th> or <td> based on header status
+    const isFullWidth = cellDiv.innerText.trim() === "---"; // Check if cell should span entire row
+    const cell = document.createElement(isHeaderSection ? 'th' : 'td');  // Create <th> or <td> based on header status
 
-    setCellAttributes(cell, cellDiv);
+    if (isFullWidth) {
+        cell.setAttribute('colspan', maxColumns); // Set colspan to maximum columns if marked with ---
+        cell.innerHTML = cleanCellText(cellDiv.innerHTML);
+    } else {
+        setCellAttributes(cell, cellDiv);
+        cell.innerHTML = cleanCellText(cellDiv.innerHTML);
+    }
 
-    // Use innerHTML to preserve nested elements and cleaned-up content
-    cell.innerHTML = cleanCellText(cellDiv.innerHTML);
-
-    console.log("Exiting createTableCell with cell type:", isHeader ? 'th' : 'td', "and content:", cell.innerHTML);
+    console.log("Exiting createTableCell with cell type:", isHeaderSection ? 'th' : 'td', "and content:", cell.innerHTML);
     return cell;
-}
-
-// Helper function to check if a cell is a header based on content
-function checkIfHeader(cellDiv) {
-    console.log("Entering checkIfHeader with cellDiv:", cellDiv);
-    const paragraphs = cellDiv.querySelectorAll('p');
-    let isHeader = false;
-
-    paragraphs.forEach((p) => {
-        if (/\$data-type=header\$/i.test(p.innerHTML)) {
-            isHeader = true;
-        }
-    });
-
-    console.log("Exiting checkIfHeader with result:", isHeader);
-    return isHeader;
 }
 
 // Function to set alignment, vertical alignment, and colspan attributes on a cell
@@ -88,7 +81,7 @@ function setCellAttributes(cell, cellDiv) {
 // Function to retrieve colspan from cell content if specified
 function getColspan(cellDiv) {
     console.log("Entering getColspan");
-    const colspanMatch = cellDiv.querySelector('p').textContent.match(/\$data-colspan=(\d+)\$/);
+    const colspanMatch = cellDiv.querySelector('p')?.textContent.match(/\$data-colspan=(\d+)\$/);
     const result = colspanMatch ? colspanMatch[1] : null;
     console.log("Exiting getColspan with result:", result);
     return result;
@@ -107,4 +100,17 @@ function cleanCellText(htmlContent) {
 
     console.log("Exiting cleanCellText with result:", result);
     return result;
+}
+
+// Function to calculate the maximum number of columns in the table
+function calculateMaxColumns(rows) {
+    let maxColumns = 0;
+    rows.forEach(row => {
+        const cellCount = row.querySelectorAll('div').length;
+        if (cellCount > maxColumns) {
+            maxColumns = cellCount;
+        }
+    });
+    console.log("Max columns calculated:", maxColumns);
+    return maxColumns;
 }
