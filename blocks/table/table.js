@@ -3,10 +3,8 @@ export default async function decorate(block) {
     console.log("Entering decorate function" + block);
     const table = createTableFromDivWrapper(block);
     // Clear any existing tables within the wrapper
-    block.innerHTML = ''; // Remove all previous child elements in block
+    block.innerHTML = ''; // Remove all previous child elements in block  
     block.appendChild(table);
-
-    const wrappers = block.querySelectorAll('div'); // Select all div elements
 
     console.log("Exiting decorate function");
 }
@@ -17,8 +15,9 @@ function createTableFromDivWrapper(divWrapper) {
     const table = document.createElement('table');
     const rows = divWrapper.querySelectorAll('.table.block > div');
 
-    rows.forEach((rowDiv) => {
-        const tr = createTableRow(rowDiv);
+    rows.forEach((rowDiv, index) => {
+        const isFirstRow = index === 0;
+        const tr = createTableRow(rowDiv, isFirstRow);
         table.appendChild(tr);
     });
 
@@ -27,13 +26,13 @@ function createTableFromDivWrapper(divWrapper) {
 }
 
 // Function to create a new <tr> element for each row div
-function createTableRow(rowDiv) {
+function createTableRow(rowDiv, isFirstRow) {
     console.log("Entering createTableRow");
     const tr = document.createElement('tr');
     const cells = rowDiv.querySelectorAll('div');
 
     cells.forEach((cellDiv) => {
-        const cell = createTableCell(cellDiv);
+        const cell = createTableCell(cellDiv, isFirstRow);
         tr.appendChild(cell);
     });
 
@@ -41,13 +40,10 @@ function createTableRow(rowDiv) {
     return tr;
 }
 
-// Function to create a table cell, either <th> or <td>, based on data-type
-// Updated function to create a table cell, handling nested HTML
-// Function to create a table cell, ensuring header cells are generated as <th>
-// Function to create a table cell, ensuring header cells are generated as <th>
-function createTableCell(cellDiv) {
+// Function to create a table cell, ensuring header cells are generated as <th> in the first row
+function createTableCell(cellDiv, isFirstRow) {
     console.log("Entering createTableCell with cellDiv:", cellDiv);
-    const isHeader = checkIfHeader(cellDiv);
+    const isHeader = isFirstRow || checkIfHeader(cellDiv); // Treat all cells in the first row as headers
     const cell = document.createElement(isHeader ? 'th' : 'td');  // Create <th> or <td> based on header status
 
     setCellAttributes(cell, cellDiv);
@@ -60,14 +56,11 @@ function createTableCell(cellDiv) {
 }
 
 // Helper function to check if a cell is a header based on content
-// Updated function to check if a cell is a header based on content, handling whitespaces and variations
-// Function to check if any <p> tag in a cell contains the header marker
 function checkIfHeader(cellDiv) {
     console.log("Entering checkIfHeader with cellDiv:", cellDiv);
     const paragraphs = cellDiv.querySelectorAll('p');
     let isHeader = false;
 
-    // Loop through all <p> tags to check for the header marker
     paragraphs.forEach((p) => {
         if (/\$data-type=header\$/i.test(p.innerHTML)) {
             isHeader = true;
@@ -102,9 +95,6 @@ function getColspan(cellDiv) {
 }
 
 // Helper function to clean up cell text by removing special markers
-// Updated helper function to clean up cell text by removing special markers, keeping HTML intact
-// Updated helper function to clean up cell text by removing special markers only, leaving other content intact
-// Updated helper function to clean up cell text by removing special markers, leaving other content intact
 function cleanCellText(htmlContent) {
     console.log("Entering cleanCellText with content:", htmlContent);
 
