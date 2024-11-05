@@ -67,7 +67,7 @@ function createTableCell(cellDiv, isHeaderSection, maxColumns) {
 
     if (isFullWidth) {
         cell.setAttribute('colspan', maxColumns); // Set colspan to maximum columns if marked with ---
-        cell.innerHTML = cleanCellText(cellDiv.innerHTML);
+        cell.innerHTML = ""; // Clear the content as it's a full-width spacer row
     } else {
         setCellAttributes(cell, cellDiv);
         cell.innerHTML = cleanCellText(cellDiv.innerHTML);
