@@ -71,6 +71,10 @@ function createTableCell(cellDiv, isHeaderSection, maxColumns) {
     } else {
         setCellAttributes(cell, cellDiv);
         cell.innerHTML = cleanCellText(cellDiv.innerHTML);
+
+        // Check for nested tables within this cell
+        const nestedTables = cell.querySelectorAll('table');
+        nestedTables.forEach(nestedTable => applyNestedTableHeaders(nestedTable));
     }
 
     console.log("Exiting createTableCell with cell type:", isHeader ? 'th' : 'td', "and content:", cell.innerHTML);
@@ -126,4 +130,24 @@ function calculateMaxColumns(rows) {
     });
     console.log("Max columns calculated:", maxColumns);
     return maxColumns;
+}
+
+// Function to apply header row formatting to the first row of a nested table
+function applyNestedTableHeaders(nestedTable) {
+    console.log("Entering applyNestedTableHeaders for a nested table");
+    const firstRow = nestedTable.querySelector('tr');
+
+    if (firstRow) {
+        const cells = firstRow.children;
+        Array.from(cells).forEach(cell => {
+            // Convert <td> to <th> if it’s not already <th>
+            if (cell.tagName.toLowerCase() === 'td') {
+                const th = document.createElement('th');
+                th.innerHTML = cell.innerHTML;
+                firstRow.replaceChild(th, cell);
+            }
+        });
+    }
+
+    console.log("Exiting applyNestedTableHeaders");
 }
