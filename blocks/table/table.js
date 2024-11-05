@@ -14,11 +14,20 @@ function createTableFromDivWrapper(divWrapper) {
     const rows = divWrapper.querySelectorAll('.table.block > div');
     const maxColumns = calculateMaxColumns(rows);
     let isHeaderSection = true;
+    let hasBoundaryRow = false;
+
+    // Check if there's a boundary row with "***" to stop treating rows as headers
+    rows.forEach((rowDiv) => {
+        const cellTexts = Array.from(rowDiv.querySelectorAll('div')).map(cell => cell.innerText.trim());
+        if (cellTexts.includes("***")) {
+            hasBoundaryRow = true;
+        }
+    });
 
     rows.forEach((rowDiv) => {
         const cellTexts = Array.from(rowDiv.querySelectorAll('div')).map(cell => cell.innerText.trim());
-        
-        if (cellTexts.includes("***")) {
+
+        if (hasBoundaryRow && cellTexts.includes("***")) {
             isHeaderSection = false; // Stop treating rows as headers after the "***" marker row
             return; // Skip the "***" row from rendering
         }
@@ -49,8 +58,12 @@ function createTableRow(rowDiv, isHeaderSection, maxColumns) {
 // Function to create a table cell, ensuring header cells are generated as <th> when in header section
 function createTableCell(cellDiv, isHeaderSection, maxColumns) {
     console.log("Entering createTableCell with cellDiv:", cellDiv);
-    const isFullWidth = cellDiv.innerText.trim() === "---"; // Check if cell should span entire row
-    const cell = document.createElement(isHeaderSection ? 'th' : 'td');  // Create <th> or <td> based on header status
+    const cellContent = cellDiv.innerText.trim();
+    const isFullWidth = cellContent === "---"; // Check if cell should span entire row
+    const isExplicitHeader = cellContent.includes('$data-type=header$'); // Check for $data-type=header$ marker
+    const isHeader = isHeaderSection || isExplicitHeader; // Treat as header if in header section or marked explicitly
+
+    const cell = document.createElement(isHeader ? 'th' : 'td');  // Create <th> or <td> based on header status
 
     if (isFullWidth) {
         cell.setAttribute('colspan', maxColumns); // Set colspan to maximum columns if marked with ---
@@ -60,7 +73,7 @@ function createTableCell(cellDiv, isHeaderSection, maxColumns) {
         cell.innerHTML = cleanCellText(cellDiv.innerHTML);
     }
 
-    console.log("Exiting createTableCell with cell type:", isHeaderSection ? 'th' : 'td', "and content:", cell.innerHTML);
+    console.log("Exiting createTableCell with cell type:", isHeader ? 'th' : 'td', "and content:", cell.innerHTML);
     return cell;
 }
 
