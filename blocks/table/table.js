@@ -16,10 +16,10 @@ function createTableFromDivWrapper(divWrapper) {
     let isHeaderSection = true;
     let hasBoundaryRow = false;
 
-    // Check if there's a boundary row with "***" to stop treating rows as headers
+    // Check if there's a boundary row with "***" or "$data-end=row$" marker to stop treating rows as headers
     rows.forEach((rowDiv) => {
         const cellTexts = Array.from(rowDiv.querySelectorAll('div')).map(cell => cell.innerText.trim());
-        if (cellTexts.includes("***")) {
+        if (cellTexts.includes("***") || cellTexts.some(text => /\$data-end=row\$/.test(text))) {
             hasBoundaryRow = true;
         }
     });
@@ -27,9 +27,9 @@ function createTableFromDivWrapper(divWrapper) {
     rows.forEach((rowDiv) => {
         const cellTexts = Array.from(rowDiv.querySelectorAll('div')).map(cell => cell.innerText.trim());
 
-        if (hasBoundaryRow && cellTexts.includes("***")) {
-            isHeaderSection = false; // Stop treating rows as headers after the "***" marker row
-            return; // Skip the "***" row from rendering
+        if (hasBoundaryRow && (cellTexts.includes("***") || cellTexts.some(text => /\$data-end=row\$/.test(text)))) {
+            isHeaderSection = false; // Stop treating rows as headers after the "***" or "$data-end=row$" marker row
+            return; // Skip the "***" or "$data-end=row$" row from rendering
         }
 
         const tr = createTableRow(rowDiv, isHeaderSection, maxColumns);
