@@ -1,104 +1,296 @@
-
 .table {
     width: 100%;
     overflow-x: auto;
-    margin:10px 0;
   }
   
   .table table {
     width: 100%;
     max-width: 100%;
-    border:1px solid #dadada;
     border-collapse: collapse;
-    font-size: var(--body-font-size-xs);
+    font-size: 16px;
   }
   
-  .table table tr th {
-    background-color: #C6D9F1;
+  main .delivery-feature-list h1 {
+    text-align: center;
   }
   
-  @media (width >= 600px) {
+  @media (min-width: 600px) {
     .table table {
-      font-size: var(--body-font-size-s);
+      font-size: 16px;
+    }
+  
+    main .delivery-feature-list {
+      padding: 10px 32px;
+      padding-bottom: 20px;
     }
   }
   
-  @media (width >= 900px) {
+  @media (min-width: 900px) {
     .table table {
-      font-size: var(--body-font-size-m);
+      font-size: 16px;
     }
+  }
+  
+  .table table thead {
+    box-shadow: 0 3px 6px 0 rgb(0 0 0 / 9%);
   }
   
   .table table thead tr {
-    border-top: 1px solid #dadada;
-    border-bottom: 1px solid #dadada;
+    border-top: 2px solid;
+    border-bottom: 2px solid;
+    border: none;
+    box-shadow: 0 3px 6px 0 rgba (0, 0, 0, 0.09);
+    background-color: #fdfdfb;
+    font-size: 18px;
+    font-family: argesta-display, argesta-display-fallback, "Times New Roman", serif;
+    height: 60px;
   }
   
   .table table tbody tr {
-    border-bottom: 1px solid #dadada;
+    border-bottom: 1px solid #d6d6d6;
+  }
+  
+  .mobile-view-section .table table thead tr {
+    background: none;
   }
   
   .table table th {
     font-weight: 700;
-    border: 1px solid #dadada;
   }
   
   .table table th,
   .table table td {
-    padding: 0.5em;
+    padding: 8px 16px;
     text-align: left;
-    border: 1px solid #dadada;
-  }
-  
-  .table table th p,
-  .table table td p {
-    margin: 0;
-  }
-  
-  .table table td p + p {
-    margin-top: 0.25em;
-  }
-  
-  /* no header variant */
-  .table.no-header table tbody tr {
-    border-top: 1px solid #dadada;
   }
   
   /* striped variant */
   .table.striped tbody tr:nth-child(odd) {
-    background-color: var(--light-color);
+    background-color: var(--overlay-background-color);
+  }
+  
+  main .plan-list-delivery table tbody tr td {
+    padding: 8px 17px;
   }
   
   /* bordered variant */
   .table.bordered table th,
   .table.bordered table td {
-    border: 1px solid #dadada;
+    border: 1px solid;
   }
-    /* Style for layout */
-    .section {
-        margin: 20px 0;
+  
+  /* new code added from here */
+  
+  main .delivery-feature-list h5,
+  main .plan-list-delivery h5 {
+    text-align: center;
+    font-size: 15px;
+    color: #fff;
+    font-weight: 300;
+    border-radius: 24px;
+    display: table;
+    margin: 0 auto;
+    margin-top: 50px;
+    padding: 11px 30px 12px;
+    background-color: #00582e;
+    text-decoration: none;
+    margin-bottom: 30px;
+  }
+  
+  .delivery-feature-list table th:nth-child(1) {
+    width: 55%;
+  }
+  
+  .delivery-feature-list table th:nth-child(2) {
+    width: 15%;
+  }
+  
+  .delivery-feature-list table th:nth-child(3) {
+    width: 15%;
+  }
+  
+  .delivery-feature-list table th:nth-child(4) {
+    width: 15%;
+  }
+  
+  .plan-list-delivery table th:nth-child(1) {
+    width: 70%;
+  }
+  
+  .plan-list-delivery table th:nth-child(2) {
+    width: 15%;
+  }
+  
+  .plan-list-delivery table th:nth-child(3) {
+    width: 15%;
+  }
+  
+  main .delivery-feature-list table td strong {
+    padding-left: 10px;
+  }
+  
+  main .plan-list-delivery table td strong {
+    padding-left: 10px;
+  }
+  
+  .delivery-feature-list table tr td:nth-child(1) {
+    font-size: 16px;
+  }
+  
+  .plan-list-delivery table tr td:nth-child(2),
+  .plan-list-delivery table tr th:nth-child(2) {
+    text-align: center;
+  }
+  
+  .plan-list-delivery table tr td:nth-child(3),
+  .plan-list-delivery table tr th:nth-child(3) {
+    text-align: center;
+  }
+  
+  .delivery-feature-list table tr td:nth-child(2),
+  .delivery-feature-list table tr th:nth-child(2) {
+    text-align: center;
+  }
+  
+  .delivery-feature-list table tr td:nth-child(3),
+  .delivery-feature-list table tr th:nth-child(3) {
+    text-align: center;
+  }
+  
+  .delivery-feature-list table tr td:nth-child(4),
+  .delivery-feature-list table tr th:nth-child(4) {
+    text-align: center;
+  }
+  
+  main .delivery-feature-list .icon svg,
+  main .plan-list-delivery .icon svg {
+    position: relative;
+    top: 12px;
+    vertical-align: 15px;
+  }
+  
+  main .delivery-feature-list tr td:first-child svg,
+  main .plan-list-delivery tr td:first-child svg {
+    width: 35px;
+    height: 35px;
+    vertical-align: -20px;
+    padding: 2px;
+    padding-bottom: 0;
+    margin-bottom: 20px;
+    margin-left: -2px;
+  }
+  
+  .delivery-feature-list .table table tbody tr:nth-child(6),
+  .delivery-feature-list .table table tbody tr:nth-child(11),
+  .delivery-feature-list .table table tbody tr:nth-child(15),
+  .delivery-feature-list .table table tbody tr:nth-child(20),
+  .delivery-feature-list .table table tbody tr:nth-child(25),
+  .delivery-feature-list .table table tbody tr:nth-child(28),
+  .delivery-feature-list .table table tbody tr:nth-child(31) {
+    border-top: 3px solid  #d6d6d6;
+  }
+  
+  .plan-list-delivery .table table tbody tr:nth-child(16),
+  .plan-list-delivery .table table tbody tr:nth-child(19),
+  .plan-list-delivery .table table tbody tr:nth-child(23),
+  .plan-list-delivery .table table tbody tr:nth-child(31) {
+    border-top: 3px solid  #d6d6d6;
+  }
+  
+  @media (max-width: 600px) {
+    .table table td {
+      padding: 8px 4px;
+      text-align: left;
     }
-
-    /* Style to distinguish source tables */
-    .table-type-container {
-        border: 1px solid #ccc;
-        padding: 10px;
-        margin-bottom: 10px;
+  
+    .delivery-feature-list table tr td {
+      font-size: 10px;
     }
-
-    table {
-        border-collapse: collapse;
-        width: 100%;
+  
+    .delivery-feature-list table th:nth-child(1),
+    .delivery-feature-list table tr td:nth-child(1) {
+      width: 80%;
     }
-
-    table,
-    th,
-    td {
-        border: 1px solid black;
+  
+    .delivery-feature-list table th:nth-child(2) {
+      width: 7%;
     }
-
-    th,
-    td {
-        padding: 8px;
-        text-align: left;
+  
+    .delivery-feature-list table th:nth-child(3) {
+      width: 7%;
     }
+  
+    .delivery-feature-list table th:nth-child(4) {
+      width: 6%;
+    }
+  
+    .delivery-feature-list .table table th {
+      padding: 8px 16px;
+      text-align: left;
+      font-size: 15px;
+    }
+  
+    .table table thead tr {
+      font-size: 15px;
+      font-family: argesta-display, argesta-display-fallback, "Times New Roman", serif;
+    }
+  
+    .delivery-feature-list table tr td:nth-child(1) {
+      font-size: 14px;
+    }
+  
+    main .delivery-feature-list .icon-yes svg {
+      width: 12px;
+      vertical-align: 16px;
+    }
+  
+    main .delivery-feature-list .icon-cross svg {
+      width: 12px;
+      vertical-align: 16px;
+    }
+  
+    main .delivery-feature-list {
+      padding: 10px 32px;
+      padding-bottom: 20px;
+    }
+  
+    main .delivery-feature-list h5,
+    main .plan-list-delivery h5 {
+      text-align: center;
+      font-size: 15px;
+      color: #fff;
+      font-weight: 300;
+      border-radius: 24px;
+      display: table;
+      margin: 0 auto;
+      margin-top: 50px;
+      padding: 11px 30px 12px;
+      background-color: #00582e;
+      text-decoration: none;
+      margin-bottom: 100px;
+    }
+  
+    .table table {
+      font-size: 14px;
+    }
+  
+    main .delivery-feature-list tr td:first-child svg,
+    main .plan-list-delivery tr td:first-child svg {
+      width: 22px;
+      height: 22px;
+    }
+  
+    .plan-list-delivery .table table th {
+      padding: 8px 4px;
+      text-align: left;
+    }
+  
+    main .plan-list-delivery h1 {
+      text-align: center;
+    }
+  
+    main .table-container {
+      padding: 0 5px;
+      margin: -25px 0;
+    }
+  }
