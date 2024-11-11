@@ -1,17 +1,17 @@
-// Main function to convert div-based tables to HTML tables with <tr>, <td>, and <th>
+// Main function to convert div-based complextables to HTML complextables with <tr>, <td>, and <th>
 export default async function decorate(block) {
     console.log("Entering decorate function" + block);
-    const table = createTableFromDivWrapper(block);
+    const complextable = createComplexTableFromDivWrapper(block);
     block.innerHTML = ''; // Clear all previous child elements in block
-    block.appendChild(table);
+    block.appendChild(complextable);
     console.log("Exiting decorate function");
 }
 
-// Function to parse the div structure and create a table
-function createTableFromDivWrapper(divWrapper) {
-    console.log("Entering createTableFromDivWrapper");
-    const table = document.createElement('table');
-    const rows = divWrapper.querySelectorAll('.table.block > div');
+// Function to parse the div structure and create a complextable
+function createComplexTableFromDivWrapper(divWrapper) {
+    console.log("Entering createComplexTableFromDivWrapper");
+    const complextable = document.createElement('complextable');
+    const rows = divWrapper.querySelectorAll('.complextable.block > div');
     const maxColumns = calculateMaxColumns(rows);
     let isHeaderSection = true;
     let hasBoundaryRow = false;
@@ -32,32 +32,32 @@ function createTableFromDivWrapper(divWrapper) {
             return; // Skip the "***" or "$data-end=row$" row from rendering
         }
 
-        const tr = createTableRow(rowDiv, isHeaderSection, maxColumns);
-        table.appendChild(tr);
+        const tr = createComplexTableRow(rowDiv, isHeaderSection, maxColumns);
+        complextable.appendChild(tr);
     });
 
-    console.log("Exiting createTableFromDivWrapper");
-    return table;
+    console.log("Exiting createComplexTableFromDivWrapper");
+    return complextable;
 }
 
 // Function to create a new <tr> element for each row div
-function createTableRow(rowDiv, isHeaderSection, maxColumns) {
-    console.log("Entering createTableRow");
+function createComplexTableRow(rowDiv, isHeaderSection, maxColumns) {
+    console.log("Entering createComplexTableRow");
     const tr = document.createElement('tr');
     const cells = rowDiv.querySelectorAll('div');
 
     cells.forEach((cellDiv) => {
-        const cell = createTableCell(cellDiv, isHeaderSection, maxColumns);
+        const cell = createComplexTableCell(cellDiv, isHeaderSection, maxColumns);
         tr.appendChild(cell);
     });
 
-    console.log("Exiting createTableRow");
+    console.log("Exiting createComplexTableRow");
     return tr;
 }
 
-// Function to create a table cell, ensuring header cells are generated as <th> when in header section
-function createTableCell(cellDiv, isHeaderSection, maxColumns) {
-    console.log("Entering createTableCell with cellDiv:", cellDiv);
+// Function to create a complextable cell, ensuring header cells are generated as <th> when in header section
+function createComplexTableCell(cellDiv, isHeaderSection, maxColumns) {
+    console.log("Entering createComplexTableCell with cellDiv:", cellDiv);
     const cellContent = cellDiv.innerText.trim();
     const isFullWidth = cellContent === "---"; // Check if cell should span entire row
     const isExplicitHeader = cellContent.includes('$data-type=header$'); // Check for $data-type=header$ marker
@@ -72,12 +72,12 @@ function createTableCell(cellDiv, isHeaderSection, maxColumns) {
         setCellAttributes(cell, cellDiv);
         cell.innerHTML = cleanCellText(cellDiv.innerHTML);
 
-        // Check for nested tables within this cell
-        const nestedTables = cell.querySelectorAll('table');
-        nestedTables.forEach(nestedTable => applyNestedTableHeaders(nestedTable));
+        // Check for nested complextables within this cell
+        const nestedComplexTables = cell.querySelectorAll('complextable');
+        nestedComplexTables.forEach(nestedComplexTable => applyNestedComplexTableHeaders(nestedComplexTable));
     }
 
-    console.log("Exiting createTableCell with cell type:", isHeader ? 'th' : 'td', "and content:", cell.innerHTML);
+    console.log("Exiting createComplexTableCell with cell type:", isHeader ? 'th' : 'td', "and content:", cell.innerHTML);
     return cell;
 }
 
@@ -119,7 +119,7 @@ function cleanCellText(htmlContent) {
     return result;
 }
 
-// Function to calculate the maximum number of columns in the table
+// Function to calculate the maximum number of columns in the complextable
 function calculateMaxColumns(rows) {
     let maxColumns = 0;
     rows.forEach(row => {
@@ -132,10 +132,10 @@ function calculateMaxColumns(rows) {
     return maxColumns;
 }
 
-// Function to apply header row formatting to the first row of a nested table
-function applyNestedTableHeaders(nestedTable) {
-    console.log("Entering applyNestedTableHeaders for a nested table");
-    const firstRow = nestedTable.querySelector('tr');
+// Function to apply header row formatting to the first row of a nested complextable
+function applyNestedComplexTableHeaders(nestedComplexTable) {
+    console.log("Entering applyNestedComplexTableHeaders for a nested complextable");
+    const firstRow = nestedComplexTable.querySelector('tr');
 
     if (firstRow) {
         const cells = firstRow.children;
@@ -149,5 +149,5 @@ function applyNestedTableHeaders(nestedTable) {
         });
     }
 
-    console.log("Exiting applyNestedTableHeaders");
+    console.log("Exiting applyNestedComplexTableHeaders");
 }
