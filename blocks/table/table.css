@@ -13,6 +13,20 @@
   main .delivery-feature-list h1 {
     text-align: center;
   }
+
+  table {
+    border-collapse: collapse; /* Ensures borders collapse for cleaner styling */
+    border: none; /* Removes the outer border of the table */
+  }
+  
+  table th, table td {
+    border: 1px solid black; /* Adds borders to the inner cells */
+  }
+  
+  table thead {
+    border: none; /* Removes any border from the header row */
+  }
+  
   
   @media (min-width: 600px) {
     .table table {
