@@ -4,6 +4,18 @@
  * https://www.hlx.live/developer/block-collection/table
  */
 
+/**
+ * Strips the outer div if it contains only one child div.
+ * @param {HTMLElement} block - The block element to check and unwrap.
+ * @returns {HTMLElement} - The unwrapped child element or the original block.
+ */
+function stripOuterDiv(block) {
+  if (block.children.length === 1 && block.firstElementChild.tagName === 'DIV') {
+      return block.firstElementChild; // Return the single child div
+  }
+  return block; // Return the original block if no unwrapping is needed
+}
+
 function buildCell(rowIndex, isHeader) {
   const cell = isHeader ? document.createElement('th') : document.createElement('td');
   if (isHeader) cell.setAttribute('scope', 'col');
@@ -11,6 +23,9 @@ function buildCell(rowIndex, isHeader) {
 }
 
 export default async function decorate(block) {
+  // Strip the outer div if applicable
+  block = stripOuterDiv(block);
+
   const table = document.createElement('table');
   const thead = document.createElement('thead');
   const tbody = document.createElement('tbody');
