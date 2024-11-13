@@ -5,62 +5,45 @@ function buildCell(isHeader) {
 }
 
 export default async function decorate(block) {
-  // Check if the block contains a single cell with another table
-  if (
-    block.children.length === 1 && // Only one child
-    block.firstElementChild.children.length === 1 && // Single child of that child
-    block.firstElementChild.firstElementChild.tagName === 'TABLE' // Child contains a table
-  ) {
-    // Replace the block with the inner table
-    const innerTable = block.firstElementChild.firstElementChild;
-
-    // Create thead and tbody if not already structured
-    const tbody = innerTable.querySelector('tbody');
+  // Check if the block contains a single-cell wrapper with another table
+  const innerTable = block.querySelector('table');
+  if (innerTable) {
+    // Create a new table structure to replace the existing one
+    const newTable = document.createElement('table');
     const thead = document.createElement('thead');
-    const newTbody = document.createElement('tbody');
+    const tbody = document.createElement('tbody');
 
-    // Iterate through the rows of the tbody
-    [...tbody.rows].forEach((row, rowIndex) => {
-      if (rowIndex < 2) {
-        // First two rows are headers
-        const headerRow = document.createElement('tr');
-        [...row.children].forEach((cell) => {
-          const th = document.createElement('th');
-          th.innerHTML = cell.innerHTML;
-          th.setAttribute('scope', 'col');
-          if (cell.hasAttribute('colspan')) {
-            th.setAttribute('colspan', cell.getAttribute('colspan'));
-          }
-          if (cell.hasAttribute('align')) {
-            th.setAttribute('align', cell.getAttribute('align'));
-          }
-          headerRow.append(th);
+    const rows = [...innerTable.querySelectorAll('tr')];
+
+    rows.forEach((row, rowIndex) => {
+      const newRow = document.createElement('tr');
+      const isHeader = rowIndex === 0 || rowIndex === 1; // First two rows are headers
+
+      [...row.children].forEach((cell) => {
+        const newCell = buildCell(isHeader);
+
+        // Preserve original cell attributes (e.g., colspan, align)
+        [...cell.attributes].forEach((attr) => {
+          newCell.setAttribute(attr.name, attr.value);
         });
-        thead.append(headerRow);
+
+        newCell.innerHTML = cell.innerHTML;
+        newRow.append(newCell);
+      });
+
+      // Add row to thead or tbody based on whether it's a header
+      if (isHeader) {
+        thead.append(newRow);
       } else {
-        // Remaining rows are body rows
-        const bodyRow = document.createElement('tr');
-        [...row.children].forEach((cell) => {
-          const td = document.createElement('td');
-          td.innerHTML = cell.innerHTML;
-          if (cell.hasAttribute('colspan')) {
-            td.setAttribute('colspan', cell.getAttribute('colspan'));
-          }
-          if (cell.hasAttribute('align')) {
-            td.setAttribute('align', cell.getAttribute('align'));
-          }
-          bodyRow.append(td);
-        });
-        newTbody.append(bodyRow);
+        tbody.append(newRow);
       }
     });
 
-    // Replace tbody with thead and new tbody
-    innerTable.innerHTML = '';
-    innerTable.append(thead, newTbody);
+    newTable.append(thead, tbody);
 
+    // Clear the block and replace it with the new table
     block.innerHTML = '';
-    block.append(innerTable);
+    block.append(newTable);
     return;
   }
 
