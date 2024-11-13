@@ -9,10 +9,22 @@ export default async function decorate(block) {
   if (
     block.children.length === 1 && // Only one child
     block.firstElementChild.children.length === 1 && // Single child of that child
-    block.firstElementChild.firstElementChild.tagName === 'DIV' // Child contains a DIV table
+    block.firstElementChild.firstElementChild.tagName === 'TABLE' // Child contains a table
   ) {
     // Replace the block with the inner table
     const innerTable = block.firstElementChild.firstElementChild;
+
+    // Ensure first row cells are rendered as th
+    const firstRow = innerTable.querySelector('tr:first-child');
+    if (firstRow) {
+      [...firstRow.children].forEach((cell) => {
+        const th = document.createElement('th');
+        th.innerHTML = cell.innerHTML;
+        th.setAttribute('scope', 'col');
+        cell.replaceWith(th);
+      });
+    }
+
     block.innerHTML = '';
     block.append(innerTable);
     return;
