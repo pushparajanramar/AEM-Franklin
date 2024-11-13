@@ -5,11 +5,24 @@
  */
 
 /**
- * Strips the outer div if it contains only one child div.
- * @param {HTMLElement} block - The block element to check and unwrap.
- * @returns {HTMLElement} - The unwrapped child element or the original block.
+ * Removes all empty divs from the block.
+ * @param {HTMLElement} block - The block element to clean up.
  */
+function removeEmptyDivs(block) {
+  [...block.children].forEach((child) => {
+      if (child.tagName === 'DIV' && child.children.length === 0 && child.textContent.trim() === '') {
+          child.remove();
+      }
+  });
+}
+
+/**
+* Strips the outer div if it contains only one child div after cleanup.
+* @param {HTMLElement} block - The block element to check and unwrap.
+* @returns {HTMLElement} - The unwrapped child element or the original block.
+*/
 function stripOuterDiv(block) {
+  removeEmptyDivs(block); // Clean up empty divs
   if (block.children.length === 1 && block.firstElementChild.tagName === 'DIV') {
       return block.firstElementChild; // Return the single child div
   }
@@ -23,7 +36,7 @@ function buildCell(rowIndex, isHeader) {
 }
 
 export default async function decorate(block) {
-  // Strip the outer div if applicable
+  // Strip the outer div if applicable after removing empty divs
   block = stripOuterDiv(block);
 
   const table = document.createElement('table');
