@@ -14,22 +14,57 @@ export default async function decorate(block) {
     // Replace the block with the inner table
     const innerTable = block.firstElementChild.firstElementChild;
 
-    // Ensure first row cells are rendered as th
-    const firstRow = innerTable.querySelector('tr:first-child');
-    if (firstRow) {
-      [...firstRow.children].forEach((cell) => {
-        const th = document.createElement('th');
-        th.innerHTML = cell.innerHTML;
-        th.setAttribute('scope', 'col');
-        cell.replaceWith(th);
-      });
-    }
+    // Create thead and tbody if not already structured
+    const tbody = innerTable.querySelector('tbody');
+    const thead = document.createElement('thead');
+    const newTbody = document.createElement('tbody');
+
+    // Iterate through the rows of the tbody
+    [...tbody.rows].forEach((row, rowIndex) => {
+      if (rowIndex < 2) {
+        // First two rows are headers
+        const headerRow = document.createElement('tr');
+        [...row.children].forEach((cell) => {
+          const th = document.createElement('th');
+          th.innerHTML = cell.innerHTML;
+          th.setAttribute('scope', 'col');
+          if (cell.hasAttribute('colspan')) {
+            th.setAttribute('colspan', cell.getAttribute('colspan'));
+          }
+          if (cell.hasAttribute('align')) {
+            th.setAttribute('align', cell.getAttribute('align'));
+          }
+          headerRow.append(th);
+        });
+        thead.append(headerRow);
+      } else {
+        // Remaining rows are body rows
+        const bodyRow = document.createElement('tr');
+        [...row.children].forEach((cell) => {
+          const td = document.createElement('td');
+          td.innerHTML = cell.innerHTML;
+          if (cell.hasAttribute('colspan')) {
+            td.setAttribute('colspan', cell.getAttribute('colspan'));
+          }
+          if (cell.hasAttribute('align')) {
+            td.setAttribute('align', cell.getAttribute('align'));
+          }
+          bodyRow.append(td);
+        });
+        newTbody.append(bodyRow);
+      }
+    });
+
+    // Replace tbody with thead and new tbody
+    innerTable.innerHTML = '';
+    innerTable.append(thead, newTbody);
 
     block.innerHTML = '';
     block.append(innerTable);
     return;
   }
 
+  // Handle other cases (fallback)
   const table = document.createElement('table');
   const thead = document.createElement('thead');
   const tbody = document.createElement('tbody');
