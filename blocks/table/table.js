@@ -26,17 +26,26 @@ export default async function decorate(block) {
   const tbody = document.createElement('tbody');
   table.append(thead, tbody);
 
+  // Determine the number of header rows based on the block's class
+  const hasTwoHeaderRows = block.classList.contains('two');
+  const hasOneHeaderRow = block.classList.contains('one');
+  const headerRowsCount = hasTwoHeaderRows ? 2 : hasOneHeaderRow ? 1 : 0;
+
   [...block.children].forEach((child, rowIndex) => {
     const row = document.createElement('tr');
-    if (rowIndex === 0 || [...child.children].some((col) => col.hasAttribute('rowspan'))) {
-      // If it's a header row or has rowspan, append to <thead>
+
+    // Check if the current row is a header row based on the detected header row count
+    const isHeaderRow = rowIndex < headerRowsCount;
+
+    if (isHeaderRow) {
+      // Append to <thead>
       thead.append(row);
     } else {
+      // Append to <tbody>
       tbody.append(row);
     }
 
     [...child.children].forEach((col) => {
-      const isHeaderRow = rowIndex === 0 || col.hasAttribute('rowspan');
       const cell = buildCell(rowIndex, col, isHeaderRow);
       row.append(cell);
     });
@@ -45,7 +54,7 @@ export default async function decorate(block) {
   // Process nested tables if any
   const nestedTable = table.querySelector('table');
   if (nestedTable) {
-    fixNestedTableStructure(nestedTable);
+    fixNestedTableStructure(nestedTable, headerRowsCount);
   }
 
   // Replace the block's content with the generated table directly
@@ -53,13 +62,13 @@ export default async function decorate(block) {
   block.replaceWith(table); // Replace the outer block (div) with the table
 }
 
-function fixNestedTableStructure(nestedTable) {
+function fixNestedTableStructure(nestedTable, headerRowsCount) {
   const tbody = nestedTable.querySelector('tbody');
   if (tbody) {
-    // Split rows into headers and body rows
+    // Split rows into headers and body rows based on headerRowsCount
     const rows = [...tbody.children];
-    const theadRows = rows.slice(0, 2); // Assume the first two rows are headers
-    const bodyRows = rows.slice(2); // Remaining rows are body rows
+    const theadRows = rows.slice(0, headerRowsCount); // Dynamic header row count
+    const bodyRows = rows.slice(headerRowsCount); // Remaining rows are body rows
 
     // Create <thead> and move header rows into it
     const thead = document.createElement('thead');
