@@ -134,6 +134,22 @@ function decorateLinks(main) {
   });
 }
 
+function convertToRelativeUrls(main) {
+  // Get the current domain name
+  const currentDomain = window.location.origin;
+  
+  // Find all anchor tags in the document
+  const anchorTags = main.querySelectorAll('a[href]');
+  
+  anchorTags.forEach(anchor => {
+      const href = anchor.getAttribute('href');
+      if (href && href.startsWith(currentDomain)) {
+          // Replace the domain name with a relative path
+          const relativeUrl = href.replace(currentDomain, '');
+          anchor.setAttribute('href', relativeUrl);
+      }
+  });
+}
 
 
 /**
@@ -149,6 +165,8 @@ export function decorateMain(main) {
   decorateSections(main);
   decorateBlocks(main);
   decorateLinks(main);
+  // Call the function to convert URLs
+  convertToRelativeUrls(main);
 }
 
 /**
