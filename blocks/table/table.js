@@ -1,17 +1,20 @@
 function buildCell(rowIndex, colElement, isHeaderRow) {
-  // If the row is part of the header (rowIndex === 0 or explicitly marked as header row), use <th>
+  // Decide whether the cell should be <th> or <td>
   const cellType = isHeaderRow ? 'th' : 'td';
   const cell = document.createElement(cellType);
 
   if (cellType === 'th') {
-      // Add scope attribute for header cells
-      cell.setAttribute('scope', 'col'); // Default to column headers
-      if (colElement.hasAttribute('rowspan')) {
-          cell.setAttribute('rowspan', colElement.getAttribute('rowspan'));
-      }
-      if (colElement.hasAttribute('colspan')) {
-          cell.setAttribute('colspan', colElement.getAttribute('colspan'));
-      }
+    cell.setAttribute('scope', 'col'); // Set scope for header cells
+  }
+
+  // Copy content and attributes from the source column
+  cell.innerHTML = colElement.innerHTML;
+
+  if (colElement.hasAttribute('rowspan')) {
+    cell.setAttribute('rowspan', colElement.getAttribute('rowspan'));
+  }
+  if (colElement.hasAttribute('colspan')) {
+    cell.setAttribute('colspan', colElement.getAttribute('colspan'));
   }
 
   return cell;
@@ -24,23 +27,49 @@ export default async function decorate(block) {
   table.append(thead, tbody);
 
   [...block.children].forEach((child, rowIndex) => {
-      const row = document.createElement('tr');
+    const row = document.createElement('tr');
+    if (rowIndex === 0 || [...child.children].some((col) => col.hasAttribute('rowspan'))) {
+      // If it's a header row or has rowspan, append to <thead>
+      thead.append(row);
+    } else {
+      tbody.append(row);
+    }
 
-      // Check if it's a header row (first row or if headers span multiple rows)
-      const isHeaderRow = rowIndex === 0 || [...child.children].some((col) => col.hasAttribute('rowspan'));
-
-      // Append to the appropriate section
-      if (isHeaderRow) thead.append(row);
-      else tbody.append(row);
-
-      [...child.children].forEach((col) => {
-          const cell = buildCell(rowIndex, col, isHeaderRow);
-          cell.innerHTML = col.innerHTML;
-          row.append(cell);
-      });
+    [...child.children].forEach((col) => {
+      const isHeaderRow = rowIndex === 0 || col.hasAttribute('rowspan');
+      const cell = buildCell(rowIndex, col, isHeaderRow);
+      row.append(cell);
+    });
   });
+
+  // Process nested tables if any
+  const nestedTable = table.querySelector('table');
+  if (nestedTable) {
+    fixNestedTableStructure(nestedTable);
+  }
 
   // Replace the block's content with the generated table directly
   block.innerHTML = ''; // Clear the outer block
   block.replaceWith(table); // Replace the outer block (div) with the table
+}
+
+function fixNestedTableStructure(nestedTable) {
+  const tbody = nestedTable.querySelector('tbody');
+  if (tbody) {
+    // Split rows into headers and body rows
+    const rows = [...tbody.children];
+    const theadRows = rows.slice(0, 2); // Assume the first two rows are headers
+    const bodyRows = rows.slice(2); // Remaining rows are body rows
+
+    // Create <thead> and move header rows into it
+    const thead = document.createElement('thead');
+    theadRows.forEach((row) => thead.appendChild(row));
+
+    // Clear the original <tbody> and move body rows into it
+    tbody.innerHTML = '';
+    bodyRows.forEach((row) => tbody.appendChild(row));
+
+    // Insert <thead> before <tbody>
+    nestedTable.insertBefore(thead, tbody);
+  }
 }
