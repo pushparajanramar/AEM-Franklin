@@ -1,22 +1,3 @@
-function simplifySingleCellTable(block) {
-  // Locate the outer table and check if it meets the criteria
-  const outerTable = block.querySelector('table');
-  const outerTbody = outerTable?.querySelector('tbody');
-  const outerRows = outerTbody?.querySelectorAll('tr');
-
-  if (outerRows?.length === 1) {
-    const singleCell = outerRows[0].querySelector('td');
-    const nestedTable = singleCell?.querySelector('table');
-
-    // If there's only one row, one cell, and a nested table, simplify
-    if (nestedTable) {
-      // Replace the outer table with the nested table
-      block.innerHTML = ''; // Clear the block
-      block.appendChild(nestedTable); // Append the nested table directly
-    }
-  }
-}
-
 
 function buildCell(rowIndex, colElement, isHeaderRow) {
   // Decide whether the cell should be <th> or <td>
@@ -76,9 +57,6 @@ export default async function decorate(block) {
   if (nestedTable) {
     fixNestedTableStructure(nestedTable, headerRowsCount);
   }
-
-  // Simplify table if it has only one row and one cell
-  simplifySingleCellTable(block);
 
   // Replace the block's content with the generated table directly
   block.innerHTML = ''; // Clear the outer block
