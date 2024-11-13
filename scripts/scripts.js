@@ -135,31 +135,28 @@ function decorateLinks(main) {
 }
 
 function convertToRelativeUrls(main) {
-   // Get the current domain for comparison
-   const currentDomain = window.location.origin;
+    // Find all <a> tags with 'href' containing 'bookmark-*'
+    const anchorTags = main.querySelectorAll('a[href*="bookmark-"]');
     
-   // Find all <a> tags with 'href' containing 'bookmark-*'
-   const anchorTags = main.querySelectorAll('a[href*="bookmark-"]');
-   
-   anchorTags.forEach(anchor => {
-       // Get the current href and id attributes
-       let href = anchor.getAttribute('href');
-       const id = anchor.getAttribute('id');
-       
-       // If the href starts with the current domain, make it relative
-       if (href && href.startsWith(currentDomain)) {
-           href = href.replace(currentDomain, '');
-       }
-       
-       // Remove all attributes
-       while (anchor.attributes.length > 0) {
-           anchor.removeAttribute(anchor.attributes[0].name);
-       }
-       
-       // Restore essential attributes
-       if (href) anchor.setAttribute('href', href);
-       if (id) anchor.setAttribute('id', id);
-   });
+    anchorTags.forEach(anchor => {
+        // Get the current href and id attributes
+        let href = anchor.getAttribute('href');
+        const id = anchor.getAttribute('id');
+        
+        // Extract only the fragment part (starting with #) from the href
+        if (href && href.includes('#')) {
+            href = href.substring(href.indexOf('#'));
+        }
+        
+        // Remove all attributes
+        while (anchor.attributes.length > 0) {
+            anchor.removeAttribute(anchor.attributes[0].name);
+        }
+        
+        // Restore essential attributes
+        if (href) anchor.setAttribute('href', href);
+        if (id) anchor.setAttribute('id', id);
+    });
 }
 
 
