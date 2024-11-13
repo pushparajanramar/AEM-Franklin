@@ -1,9 +1,19 @@
-function buildCell(rowIndex, colElement) {
-  // Determine whether to use a <th> or <td>
-  const cellType = rowIndex === 0 || (colElement.hasAttribute('rowspan') && rowIndex <= parseInt(colElement.getAttribute('rowspan'), 10)) ? 'th' : 'td';
+function buildCell(rowIndex, colElement, isHeaderRow) {
+  // If the row is part of the header (rowIndex === 0 or explicitly marked as header row), use <th>
+  const cellType = isHeaderRow ? 'th' : 'td';
   const cell = document.createElement(cellType);
 
-  if (cellType === 'th') cell.setAttribute('scope', 'row'); // Add scope for accessibility
+  if (cellType === 'th') {
+      // Add scope attribute for header cells
+      cell.setAttribute('scope', 'col'); // Default to column headers
+      if (colElement.hasAttribute('rowspan')) {
+          cell.setAttribute('rowspan', colElement.getAttribute('rowspan'));
+      }
+      if (colElement.hasAttribute('colspan')) {
+          cell.setAttribute('colspan', colElement.getAttribute('colspan'));
+      }
+  }
+
   return cell;
 }
 
@@ -13,22 +23,19 @@ export default async function decorate(block) {
   const tbody = document.createElement('tbody');
   table.append(thead, tbody);
 
-  // Generate table rows and cells
   [...block.children].forEach((child, rowIndex) => {
       const row = document.createElement('tr');
-      if (rowIndex === 0) thead.append(row);
+
+      // Check if it's a header row (first row or if headers span multiple rows)
+      const isHeaderRow = rowIndex === 0 || [...child.children].some((col) => col.hasAttribute('rowspan'));
+
+      // Append to the appropriate section
+      if (isHeaderRow) thead.append(row);
       else tbody.append(row);
 
       [...child.children].forEach((col) => {
-          const cell = buildCell(rowIndex, col);
+          const cell = buildCell(rowIndex, col, isHeaderRow);
           cell.innerHTML = col.innerHTML;
-
-          // Handle rowspan if present
-          if (col.hasAttribute('rowspan')) {
-              const rowspan = parseInt(col.getAttribute('rowspan'), 10);
-              cell.setAttribute('rowspan', rowspan);
-          }
-
           row.append(cell);
       });
   });
