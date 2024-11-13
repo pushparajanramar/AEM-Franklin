@@ -29,9 +29,19 @@ function stripOuterDiv(block) {
   return block; // Return the original block if no unwrapping is needed
 }
 
-function buildCell(rowIndex, isHeader) {
+function buildCell(isHeader, colElement) {
   const cell = isHeader ? document.createElement('th') : document.createElement('td');
   if (isHeader) cell.setAttribute('scope', 'col');
+
+  // Copy attributes like rowspan and colspan
+  if (colElement.hasAttribute('rowspan')) {
+      cell.setAttribute('rowspan', colElement.getAttribute('rowspan'));
+  }
+  if (colElement.hasAttribute('colspan')) {
+      cell.setAttribute('colspan', colElement.getAttribute('colspan'));
+  }
+
+  cell.innerHTML = colElement.innerHTML;
   return cell;
 }
 
@@ -46,38 +56,27 @@ export default async function decorate(block) {
 
   const children = [...block.children];
 
-  // Determine the number of header rows from the first cell's rowspan
-  const headerRowCount = parseInt(
-      children[0]?.children[0]?.getAttribute('rowspan') || 1,
-      10
-  );
-
-  children.forEach((child, rowIndex) => {
+  let isHeaderGroup = true; // Flag to determine when to switch from header to body rows
+  children.forEach((child) => {
       const row = document.createElement('tr');
-      
-      if (rowIndex < headerRowCount) {
-          // Render these rows in thead as headers
+      const isHeader = isHeaderGroup;
+
+      // Add row to thead or tbody based on the isHeader flag
+      if (isHeader) {
           thead.append(row);
       } else {
-          // Render remaining rows in tbody
           tbody.append(row);
       }
 
       [...child.children].forEach((col) => {
-          const isHeaderRow = rowIndex < headerRowCount;
-          const cell = buildCell(rowIndex, isHeaderRow);
-          
-          // Copy attributes like rowspan/colspan if present
-          if (col.hasAttribute('rowspan')) {
-              cell.setAttribute('rowspan', col.getAttribute('rowspan'));
-          }
-          if (col.hasAttribute('colspan')) {
-              cell.setAttribute('colspan', col.getAttribute('colspan'));
-          }
-
-          cell.innerHTML = col.innerHTML;
+          const cell = buildCell(isHeader, col);
           row.append(cell);
       });
+
+      // Check if this row ends the header group (no more th elements)
+      if (child.querySelectorAll('[rowspan], [colspan]').length === 0) {
+          isHeaderGroup = false;
+      }
   });
 
   // Clear the block and append the newly created table
