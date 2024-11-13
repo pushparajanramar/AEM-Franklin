@@ -135,20 +135,31 @@ function decorateLinks(main) {
 }
 
 function convertToRelativeUrls(main) {
-  // Get the current domain name
-  const currentDomain = window.location.origin;
-  
-  // Find all anchor tags in the document
-  const anchorTags = main.querySelectorAll('a[href]');
-  
-  anchorTags.forEach(anchor => {
-      const href = anchor.getAttribute('href');
-      if (href && href.startsWith(currentDomain)) {
-          // Replace the domain name with a relative path
-          const relativeUrl = href.replace(currentDomain, '');
-          anchor.setAttribute('href', relativeUrl);
-      }
-  });
+   // Get the current domain for comparison
+   const currentDomain = window.location.origin;
+    
+   // Find all <a> tags with 'href' containing 'bookmark-*'
+   const anchorTags = main.querySelectorAll('a[href*="bookmark-"]');
+   
+   anchorTags.forEach(anchor => {
+       // Get the current href and id attributes
+       let href = anchor.getAttribute('href');
+       const id = anchor.getAttribute('id');
+       
+       // If the href starts with the current domain, make it relative
+       if (href && href.startsWith(currentDomain)) {
+           href = href.replace(currentDomain, '');
+       }
+       
+       // Remove all attributes
+       while (anchor.attributes.length > 0) {
+           anchor.removeAttribute(anchor.attributes[0].name);
+       }
+       
+       // Restore essential attributes
+       if (href) anchor.setAttribute('href', href);
+       if (id) anchor.setAttribute('id', id);
+   });
 }
 
 
