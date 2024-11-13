@@ -1,6 +1,9 @@
-function buildCell(rowIndex) {
-  const cell = rowIndex ? document.createElement('td') : document.createElement('th');
-  if (!rowIndex) cell.setAttribute('scope', 'col');
+function buildCell(rowIndex, colElement) {
+  // Determine whether to use a <th> or <td>
+  const cellType = rowIndex === 0 || (colElement.hasAttribute('rowspan') && rowIndex <= parseInt(colElement.getAttribute('rowspan'), 10)) ? 'th' : 'td';
+  const cell = document.createElement(cellType);
+
+  if (cellType === 'th') cell.setAttribute('scope', 'row'); // Add scope for accessibility
   return cell;
 }
 
@@ -10,14 +13,22 @@ export default async function decorate(block) {
   const tbody = document.createElement('tbody');
   table.append(thead, tbody);
 
-  // Generate the table content
-  [...block.children].forEach((child, i) => {
+  // Generate table rows and cells
+  [...block.children].forEach((child, rowIndex) => {
       const row = document.createElement('tr');
-      if (i) tbody.append(row);
-      else thead.append(row);
+      if (rowIndex === 0) thead.append(row);
+      else tbody.append(row);
+
       [...child.children].forEach((col) => {
-          const cell = buildCell(i);
+          const cell = buildCell(rowIndex, col);
           cell.innerHTML = col.innerHTML;
+
+          // Handle rowspan if present
+          if (col.hasAttribute('rowspan')) {
+              const rowspan = parseInt(col.getAttribute('rowspan'), 10);
+              cell.setAttribute('rowspan', rowspan);
+          }
+
           row.append(cell);
       });
   });
