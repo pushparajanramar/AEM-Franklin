@@ -4,39 +4,49 @@
  * https://www.hlx.live/developer/block-collection/table
  */
 
-function buildCell(rowIndex, colElement) {
-  const cell = rowIndex ? document.createElement('td') : document.createElement('th');
-  if (!rowIndex) cell.setAttribute('scope', 'col');
-
-  // Check for rowspan or other attributes in the original element
-  if (colElement.hasAttribute('rowspan')) {
-      cell.setAttribute('rowspan', colElement.getAttribute('rowspan'));
-  }
-  if (colElement.hasAttribute('colspan')) {
-      cell.setAttribute('colspan', colElement.getAttribute('colspan'));
-  }
-
+function buildCell(rowIndex, isHeader) {
+  const cell = isHeader ? document.createElement('th') : document.createElement('td');
+  if (isHeader) cell.setAttribute('scope', 'col');
   return cell;
 }
 
 export default async function decorate(block) {
-  // Check if the block contains only one child div
-  if (block.children.length === 1 && block.firstElementChild.tagName === 'DIV') {
-      block = block.firstElementChild; // Ignore the outer div
-  }
-
   const table = document.createElement('table');
   const thead = document.createElement('thead');
   const tbody = document.createElement('tbody');
   table.append(thead, tbody);
 
-  [...block.children].forEach((child, i) => {
+  const children = [...block.children];
+
+  // Determine the number of header rows from the first cell's rowspan
+  const headerRowCount = parseInt(
+      children[0]?.children[0]?.getAttribute('rowspan') || 1,
+      10
+  );
+
+  children.forEach((child, rowIndex) => {
       const row = document.createElement('tr');
-      if (i === 0) thead.append(row); // First row goes into the table header
-      else tbody.append(row);
+      
+      if (rowIndex < headerRowCount) {
+          // Render these rows in thead as headers
+          thead.append(row);
+      } else {
+          // Render remaining rows in tbody
+          tbody.append(row);
+      }
 
       [...child.children].forEach((col) => {
-          const cell = buildCell(i, col);
+          const isHeaderRow = rowIndex < headerRowCount;
+          const cell = buildCell(rowIndex, isHeaderRow);
+          
+          // Copy attributes like rowspan/colspan if present
+          if (col.hasAttribute('rowspan')) {
+              cell.setAttribute('rowspan', col.getAttribute('rowspan'));
+          }
+          if (col.hasAttribute('colspan')) {
+              cell.setAttribute('colspan', col.getAttribute('colspan'));
+          }
+
           cell.innerHTML = col.innerHTML;
           row.append(cell);
       });
