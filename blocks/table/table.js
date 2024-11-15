@@ -1,85 +1,140 @@
+// Main function to convert div-based tables to HTML tables with <tr>, <td>, <th>
+export default async function decorate(block) {
+  const table = createTableFromDivWrapper(block);
+  block.innerHTML = ''; // Clear all previous child elements in block
+  block.appendChild(table);
+}
 
-function buildCell(rowIndex, colElement, isHeaderRow) {
-  // Decide whether the cell should be <th> or <td>
-  const cellType = isHeaderRow ? 'th' : 'td';
-  const cell = document.createElement(cellType);
+// Function to parse the div structure and create a table
+function createTableFromDivWrapper(divWrapper) {
+  const table = document.createElement('table');
+  const rows = divWrapper.querySelectorAll('.table.block > div');
+  const maxColumns = calculateMaxColumns(rows);
+  let isHeaderSection = true;
+  let hasBoundaryRow = false;
+  // Check if there's a boundary row with "***" or "$data-end=row$" marker to stop treating rows as headers
+  rows.forEach((rowDiv) => {
+      const cellTexts = Array.from(rowDiv.querySelectorAll('div')).map(cell => cell.innerText.trim());
+      if (cellTexts.includes("***") || cellTexts.some(text => /\$data-end=row\$/.test(text))) {
+          hasBoundaryRow = true;
+      }
+  });
 
-  if (cellType === 'th') {
-    cell.setAttribute('scope', 'col'); // Set scope for header cells
+  const thead = document.createElement('thead');
+  const tbody = document.createElement('tbody');
+  rows.forEach((rowDiv) => {
+      const cellTexts = Array.from(rowDiv.querySelectorAll('div')).map(cell => cell.innerText.trim());
+      if (hasBoundaryRow && (cellTexts.includes("***") || cellTexts.some(text => /\$data-end=row\$/.test(text)))) {
+          isHeaderSection = false; // Stop treating rows as headers after the "***" or "$data-end=row$" marker row
+          return; // Skip the "***" or "$data-end=row$" row from rendering
+      }
+      const tr = createTableRow(rowDiv, isHeaderSection, maxColumns);
+      // Append the row to the correct section (thead or tbody)
+      if (isHeaderSection) {
+          thead.appendChild(tr);
+      } else {
+          tbody.appendChild(tr);
+      }
+  });
+
+  // Append both thead and tbody to the table
+  table.appendChild(thead);
+  table.appendChild(tbody);
+  return table;
+}
+
+// Function to create a new <tr> element for each row div
+function createTableRow(rowDiv, isHeaderSection, maxColumns) {
+  const tr = document.createElement('tr');
+  const cells = rowDiv.querySelectorAll('div');
+  cells.forEach((cellDiv) => {
+      const cell = createTableCell(cellDiv, isHeaderSection, maxColumns);
+      tr.appendChild(cell);
+  });
+ return tr;
+}
+
+// Function to create a table cell, ensuring header cells are generated as <th> when in header section
+function createTableCell(cellDiv, isHeaderSection, maxColumns) {
+  const cellContent = cellDiv.innerText.trim();
+  const isFullWidth = cellContent === "---"; // Check if cell should span entire row
+  const isExplicitHeader = cellContent.includes('$data-type=header$'); // Check for $data-type=header$ marker
+  const isHeader = isHeaderSection || isExplicitHeader; // Treat as header if in header section or marked explicitly
+  const cell = document.createElement(isHeader ? 'th' : 'td');  // Create <th> or <td> based on header status
+  if (isFullWidth) {
+      cell.setAttribute('colspan', maxColumns); // Set colspan to maximum columns if marked with ---
+      cell.innerHTML = ""; // Clear the content as it's a full-width spacer row
+  } else {
+      setCellAttributes(cell, cellDiv);
+      cell.innerHTML = cleanCellText(cellDiv.innerHTML);
+      // Check if this is a header cell and has a colspan, then align it to center
+      if (isHeader && getColspan(cellDiv)) {
+          cell.style.textAlign = 'center';
+      }
+      // Check for nested tables within this cell
+      const nestedTables = cell.querySelectorAll('table');
+      nestedTables.forEach(nestedTable => applyNestedTableHeaders(nestedTable));
   }
-
-  // Copy content and attributes from the source column
-  cell.innerHTML = colElement.innerHTML;
-
-  if (colElement.hasAttribute('rowspan')) {
-    cell.setAttribute('rowspan', colElement.getAttribute('rowspan'));
-  }
-  if (colElement.hasAttribute('colspan')) {
-    cell.setAttribute('colspan', colElement.getAttribute('colspan'));
-  }
-
   return cell;
 }
 
-export default async function decorate(block) {
-  const table = document.createElement('table');
-  const thead = document.createElement('thead');
-  const tbody = document.createElement('tbody');
-  table.append(thead, tbody);
-
-  // Determine the number of header rows based on the block's class
-  const hasTwoHeaderRows = block.classList.contains('two');
-  const hasOneHeaderRow = block.classList.contains('one');
-  const headerRowsCount = hasTwoHeaderRows ? 2 : hasOneHeaderRow ? 1 : 0;
-
-  [...block.children].forEach((child, rowIndex) => {
-    const row = document.createElement('tr');
-
-    // Check if the current row is a header row based on the detected header row count
-    const isHeaderRow = rowIndex < headerRowsCount;
-
-    if (isHeaderRow) {
-      // Append to <thead>
-      thead.append(row);
-    } else {
-      // Append to <tbody>
-      tbody.append(row);
-    }
-
-    [...child.children].forEach((col) => {
-      const cell = buildCell(rowIndex, col, isHeaderRow);
-      row.append(cell);
-    });
-  });
-
-  // Process nested tables if any
-  const nestedTable = table.querySelector('table');
-  if (nestedTable) {
-    fixNestedTableStructure(nestedTable, headerRowsCount);
-  }
-
-  // Replace the block's content with the generated table directly
-  block.innerHTML = ''; // Clear the outer block
-  block.replaceWith(table); // Replace the outer block (div) with the table
+// Function to set alignment, vertical alignment, and colspan attributes on a cell
+function setCellAttributes(cell, cellDiv) {
+  const align = cellDiv.getAttribute('data-align');
+  const valign = cellDiv.getAttribute('data-valign');
+  const colspan = getColspan(cellDiv);
+  if (align) cell.style.textAlign = align;
+  if (valign) cell.style.verticalAlign = valign;
+  if (colspan) cell.setAttribute('colspan', colspan);
 }
 
-function fixNestedTableStructure(nestedTable, headerRowsCount) {
-  const tbody = nestedTable.querySelector('tbody');
-  if (tbody) {
-    // Split rows into headers and body rows based on headerRowsCount
-    const rows = [...tbody.children];
-    const theadRows = rows.slice(0, headerRowsCount); // Dynamic header row count
-    const bodyRows = rows.slice(headerRowsCount); // Remaining rows are body rows
+// Function to retrieve colspan from cell content if specified
+function getColspan(cellDiv) {
+  let result = null; // Declare result
+  const colspanMatch = cellDiv.querySelectorAll('p');
+  colspanMatch.forEach((p) => {
+      const match = p.innerHTML.match(/\$data-colspan=(\d+)\$/i); // Match and capture the number
+      if (match) {
+          result = match[1]; // Extract the number from the match
+      }
+  });
+  return result; // Return result
+}
 
-    // Create <thead> and move header rows into it
-    const thead = document.createElement('thead');
-    theadRows.forEach((row) => thead.appendChild(row));
+// Helper function to clean up cell text by removing special markers
+function cleanCellText(htmlContent) {
+  // Remove $...$ markers only, keeping all other HTML content intact
+  const result = htmlContent
+      .replace(/\$data-type=header\$/g, '')  // Remove header marker
+      .replace(/\$data-end=row\$/g, '')      // Remove row end marker
+      .replace(/\$data-colspan=\d+\$/g, '')  // Remove colspan marker
+      .trim();
+  return result;
+}
+// Function to calculate the maximum number of columns in the table
+function calculateMaxColumns(rows) {
+  let maxColumns = 0;
+  rows.forEach(row => {
+      const cellCount = row.querySelectorAll('div').length;
+      if (cellCount > maxColumns) {
+          maxColumns = cellCount;
+      }
+  });
+  return maxColumns;
+}
 
-    // Clear the original <tbody> and move body rows into it
-    tbody.innerHTML = '';
-    bodyRows.forEach((row) => tbody.appendChild(row));
-
-    // Insert <thead> before <tbody>
-    nestedTable.insertBefore(thead, tbody);
+// Function to apply header row formatting to the first row of a nested table
+function applyNestedTableHeaders(nestedTable) {
+ const firstRow = nestedTable.querySelector('tr');
+  if (firstRow) {
+      const cells = firstRow.children;
+      Array.from(cells).forEach(cell => {
+          // Convert <td> to <th> if it’s not already <th>
+          if (cell.tagName.toLowerCase() === 'td') {
+              const th = document.createElement('th');
+              th.innerHTML = cell.innerHTML;
+              firstRow.replaceChild(th, cell);
+          }
+      });
   }
 }
