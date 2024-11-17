@@ -61,66 +61,6 @@ function buildAutoBlocks(main) {
   }
 }
 
-function decorateLinks(main) {
-  const links = main.querySelectorAll('a');
-  let linkCounter = 0;
-
-  links.forEach((link) => {
-    const { href } = link;
-
-    // Convert to relative URL if within the same domain
-    if (href.startsWith(window.location.origin)) {
-      link.setAttribute('href', convertToRelative(href));
-    }
-
-    // Add unique id if not present
-    if (!link.hasAttribute('id')) {
-      linkCounter++;
-      link.setAttribute('id', `link-${linkCounter}`);
-    }
-
-    // Handle internal references
-    if (link.hash) {
-      const targetId = link.hash.substring(1);
-      const targetElement = document.getElementById(targetId);
-
-      if (targetElement) {
-        const targetParent = targetElement.closest('p');
-        if (targetParent) {
-          // Locate the citation number within the parent paragraph
-          const citationNumberMatch = targetParent.textContent.match(/^\d+\./); // Matches patterns like "2."
-          if (citationNumberMatch) {
-            const citationNumber = citationNumberMatch[0]; // Extract the citation number
-            const anchor = document.createElement('a');
-            anchor.href = `#${link.id}`;
-            anchor.textContent = citationNumber;
-            anchor.className = 'citation-anchor';
-
-            // Replace the citation number in the paragraph with the anchor
-            targetParent.innerHTML = targetParent.innerHTML.replace(
-              citationNumber,
-              anchor.outerHTML
-            );
-
-            console.log(`DEBUG: Citation anchor created and assigned for ${citationNumber}`);
-          } else {
-            console.warn(
-              `DEBUG: Citation number not found or anchor not assigned for reference in paragraph: "${targetParent.textContent.trim()}"`
-            );
-          }
-        } else {
-          console.warn(
-            `DEBUG: Target parent paragraph not found for internal reference: ${targetId}`
-          );
-        }
-      } else {
-        console.warn(
-          `DEBUG: Target element not found for hash reference: ${link.hash}`
-        );
-      }
-    }
-  });
-}
 
 /**
  * Converts specific anchor tags to relative URLs and cleans attributes.
