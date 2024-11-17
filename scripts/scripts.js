@@ -101,8 +101,22 @@ function decorateLinks(main) {
               citationNumber,
               anchor.outerHTML
             );
+
+            console.log(`DEBUG: Citation anchor created and assigned for ${citationNumber}`);
+          } else {
+            console.warn(
+              `DEBUG: Citation number not found or anchor not assigned for reference in paragraph: "${targetParent.textContent.trim()}"`
+            );
           }
+        } else {
+          console.warn(
+            `DEBUG: Target parent paragraph not found for internal reference: ${targetId}`
+          );
         }
+      } else {
+        console.warn(
+          `DEBUG: Target element not found for hash reference: ${link.hash}`
+        );
       }
     }
   });
