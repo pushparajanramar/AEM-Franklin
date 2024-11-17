@@ -61,10 +61,6 @@ function buildAutoBlocks(main) {
   }
 }
 
-/**
- * Decorates links with relative paths and adds reverse references.
- * @param {Element} main The container element
- */
 function decorateLinks(main) {
   const links = main.querySelectorAll('a');
   let linkCounter = 0;
@@ -90,12 +86,22 @@ function decorateLinks(main) {
 
       if (targetElement) {
         const targetParent = targetElement.closest('p');
-        if (targetParent && !targetParent.querySelector('a.reverse-link')) {
-          const reverseLink = document.createElement('a');
-          reverseLink.href = `#${link.id}`;
-          reverseLink.textContent = '↩ Back to reference';
-          reverseLink.className = 'reverse-link';
-          targetParent.appendChild(reverseLink);
+        if (targetParent) {
+          // Locate the citation number within the parent paragraph
+          const citationNumberMatch = targetParent.textContent.match(/^\d+\./); // Matches patterns like "2."
+          if (citationNumberMatch) {
+            const citationNumber = citationNumberMatch[0]; // Extract the citation number
+            const anchor = document.createElement('a');
+            anchor.href = `#${link.id}`;
+            anchor.textContent = citationNumber;
+            anchor.className = 'citation-anchor';
+
+            // Replace the citation number in the paragraph with the anchor
+            targetParent.innerHTML = targetParent.innerHTML.replace(
+              citationNumber,
+              anchor.outerHTML
+            );
+          }
         }
       }
     }
