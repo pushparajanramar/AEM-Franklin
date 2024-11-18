@@ -11,37 +11,16 @@ import {
   loadSection,
   loadSections,
   loadCSS,
-  sampleRUM,
 } from './aem.js';
 
 /**
- * Converts absolute URLs to relative URLs.
- * @param {string} href The absolute URL
- * @returns {string} The relative URL
- */
-function convertToRelative(href) {
-  const url = new URL(href, window.location.origin);
-  return url.pathname + url.search + url.hash;
-}
-
-/**
- * Generates a valid id from a relative URL.
- * @param {string} href The relative URL
- * @returns {string} A unique id
- */
-function generateId(href) {
-  const url = convertToRelative(href);
-  return url.replace(/[^\w-]+/g, '_');
-}
-
-/**
- * Builds hero block and prepends it to main in a new section.
+ * Builds hero block and prepends to main in a new section.
  * @param {Element} main The container element
  */
 function buildHeroBlock(main) {
   const h1 = main.querySelector('h1');
   const picture = main.querySelector('picture');
-
+  // eslint-disable-next-line no-bitwise
   if (h1 && picture && (h1.compareDocumentPosition(picture) & Node.DOCUMENT_POSITION_PRECEDING)) {
     const section = document.createElement('div');
     section.append(buildBlock('hero', { elems: [picture, h1] }));
@@ -69,116 +48,28 @@ function buildAutoBlocks(main) {
   try {
     buildHeroBlock(main);
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error('Auto Blocking failed', error);
   }
-}
-
-/**
- * Decorates links with relative paths and adds reverse references.
- * @param {Element} main The container element
- */
-function decorateLinks(main) {
-  const links = main.querySelectorAll('a');
-  let linkCounter = 0;
-
-  links.forEach((link) => {
-    const { href } = link;
-    console.log(`DEBUG: Citation anchor url created  ${href}`);
-
-    // Convert to relative URL if within the same domain
-    if (href.startsWith(window.location.origin)) {
-      link.setAttribute('href', convertToRelative(href));
-    }
-
-    // Add unique id if not present
-    if (!link.hasAttribute('id')) {
-      linkCounter++;
-      link.setAttribute('id', `link-${linkCounter}`);
-    }
-
-    // Handle internal references
-    if (link.hash) {
-      const targetId = link.hash.substring(1);
-      const targetElement = document.getElementById(targetId);
-
-      if (targetElement) {
-        const targetParent = targetElement.closest('p');
-        if (targetParent) {
-          // Locate the citation number within the parent paragraph
-          const citationNumberMatch = targetParent.textContent.match(/^\d+\./); // Matches patterns like "2."
-          if (citationNumberMatch) {
-            const citationNumber = citationNumberMatch[0]; // Extract the citation number
-            const anchor = document.createElement('a');
-            anchor.href = `#${link.id}`;
-            anchor.textContent = citationNumber;
-            anchor.className = 'citation-anchor';
-
-            // Replace the citation number in the paragraph with the anchor
-            targetParent.innerHTML = targetParent.innerHTML.replace(
-              citationNumber,
-              anchor.outerHTML
-            );
-
-            console.log(`DEBUG: Citation anchor created and assigned for ${citationNumber}`);
-          } else {
-            console.warn(
-              `DEBUG: Citation number not found or anchor not assigned for reference in paragraph: "${targetParent.textContent.trim()}"`
-            );
-          }
-        } else {
-          console.warn(
-            `DEBUG: Target parent paragraph not found for internal reference: ${targetId}`
-          );
-        }
-      } else {
-        console.warn(
-          `DEBUG: Target element not found for hash reference: ${link.hash}`
-        );
-      }
-    }
-  });
-}
-
-/**
- * Converts specific anchor tags to relative URLs and cleans attributes.
- * @param {Element} main The container element
- */
-function convertToRelativeUrls(main) {
-  const anchors = main.querySelectorAll('a[href*="bookmark-"]');
-  anchors.forEach((anchor) => {
-    let href = anchor.getAttribute('href');
-    const id = anchor.getAttribute('id');
-
-    if (href && href.includes('#')) {
-      href = href.substring(href.indexOf('#'));
-    }
-
-    while (anchor.attributes.length > 0) {
-      anchor.removeAttribute(anchor.attributes[0].name);
-    }
-
-    if (href) anchor.setAttribute('href', href);
-    if (id) anchor.setAttribute('id', id);
-  });
 }
 
 /**
  * Decorates the main element.
  * @param {Element} main The main element
  */
+// eslint-disable-next-line import/prefer-default-export
 export function decorateMain(main) {
+  // hopefully forward compatible button decoration
   decorateButtons(main);
   decorateIcons(main);
   buildAutoBlocks(main);
   decorateSections(main);
   decorateBlocks(main);
-  decorateLinks(main);
-  convertToRelativeUrls(main);
 }
 
 /**
- * Loads essential elements for LCP.
- * @param {Element} doc The document container
+ * Loads everything needed to get to LCP.
+ * @param {Element} doc The container element
  */
 async function loadEager(doc) {
   document.documentElement.lang = 'en';
@@ -189,41 +80,46 @@ async function loadEager(doc) {
     document.body.classList.add('appear');
     await loadSection(main.querySelector('.section'), waitForFirstImage);
   }
-  sampleRUM.enhance();
-  if (window.innerWidth >= 900 || sessionStorage.getItem('fonts-loaded')) {
-    await loadFonts();
+
+  try {
+    /* if desktop (proxy for fast connection) or fonts already loaded, load fonts.css */
+    if (window.innerWidth >= 900 || sessionStorage.getItem('fonts-loaded')) {
+      loadFonts();
+    }
+  } catch (e) {
+    // do nothing
   }
 }
 
 /**
- * Loads deferred elements.
- * @param {Element} doc The document container
+ * Loads everything that doesn't need to be delayed.
+ * @param {Element} doc The container element
  */
 async function loadLazy(doc) {
   const main = doc.querySelector('main');
   await loadSections(main);
 
   const { hash } = window.location;
-  if (hash) {
-    const element = doc.getElementById(hash.substring(1));
-    if (element) element.scrollIntoView();
-  }
+  const element = hash ? doc.getElementById(hash.substring(1)) : false;
+  if (hash && element) element.scrollIntoView();
 
   loadHeader(doc.querySelector('header'));
   loadFooter(doc.querySelector('footer'));
+
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
+  loadFonts();
 }
 
 /**
- * Loads delayed assets.
+ * Loads everything that happens a lot later,
+ * without impacting the user experience.
  */
 function loadDelayed() {
-  setTimeout(() => import('./delayed.js'), 3000);
+  // eslint-disable-next-line import/no-cycle
+  window.setTimeout(() => import('./delayed.js'), 3000);
+  // load anything that can be postponed to the latest here
 }
 
-/**
- * Main entry point for the page.
- */
 async function loadPage() {
   await loadEager(document);
   await loadLazy(document);
