@@ -83,6 +83,7 @@ function decorateLinks(main) {
 
   links.forEach((link) => {
     const { href } = link;
+    console.log(`DEBUG: Citation anchor url created  ${href}`);
 
     // Convert to relative URL if within the same domain
     if (href.startsWith(window.location.origin)) {
